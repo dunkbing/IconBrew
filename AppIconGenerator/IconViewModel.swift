@@ -29,6 +29,13 @@ class IconViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var showError = false
 
+    @Published var showSidebar = true
+    @Published var editedImage: NSImage?
+
+    func updateEditedImage(_ image: NSImage?) {
+        self.editedImage = image
+    }
+
     func selectImage(completion: @escaping (NSImage?) -> Void) {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false

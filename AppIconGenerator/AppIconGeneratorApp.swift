@@ -12,7 +12,7 @@ struct AppIconGenerator: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .frame(minWidth: 600, minHeight: 500)
+                .frame(minWidth: 850, minHeight: 550)
                 .onAppear {
                     NSWindow.allowsAutomaticWindowTabbing = false
                 }

@@ -12,40 +12,70 @@ struct ContentView: View {
     @State private var showingInfo = false
 
     var body: some View {
-        VStack(spacing: 20) {
-            HStack {
-                HeaderView()
-                Spacer()
-                Button(action: { showingInfo = true }) {
-                    Image(systemName: "info.circle")
+        HStack(spacing: 0) {
+            // Main content
+            VStack(spacing: 20) {
+                HStack {
+                    HeaderView()
+                    Spacer()
+
+                    // Toggle sidebar button
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            iconViewModel.showSidebar.toggle()
+                        }
+                    }) {
+                        Image(
+                            systemName: iconViewModel.showSidebar ? "sidebar.right" : "sidebar.left"
+                        )
                         .font(.system(size: 18))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundColor(.blue)
+                    .help(iconViewModel.showSidebar ? "Hide Editor" : "Show Editor")
+
+                    Button(action: { showingInfo = true }) {
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 18))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundColor(.blue)
+                    .sheet(isPresented: $showingInfo) {
+                        InfoView(isPresented: $showingInfo)
+                    }
                 }
-                .buttonStyle(.plain)
-                .foregroundColor(.blue)
-                .sheet(isPresented: $showingInfo) {
-                    InfoView(isPresented: $showingInfo)
-                }
+
+                ImageDropView(
+                    sourceImage: $iconViewModel.sourceImage,
+                    isImageDragging: $iconViewModel.isImageDragging
+                )
+
+                PlatformSelectionView(
+                    iOSSelected: $iconViewModel.iOSSelected,
+                    macOSSelected: $iconViewModel.macOSSelected,
+                    watchOSSelected: $iconViewModel.watchOSSelected,
+                    androidSelected: $iconViewModel.androidSelected,
+                    webSelected: $iconViewModel.webSelected,
+                    unifiedAppleIconsSelected: $iconViewModel.unifiedAppleIconsSelected
+                )
+
+                GenerationControlsView(
+                    viewModel: iconViewModel
+                )
             }
+            .padding(30)
 
-            ImageDropView(
-                sourceImage: $iconViewModel.sourceImage,
-                isImageDragging: $iconViewModel.isImageDragging
-            )
-
-            PlatformSelectionView(
-                iOSSelected: $iconViewModel.iOSSelected,
-                macOSSelected: $iconViewModel.macOSSelected,
-                watchOSSelected: $iconViewModel.watchOSSelected,
-                androidSelected: $iconViewModel.androidSelected,
-                webSelected: $iconViewModel.webSelected,
-                unifiedAppleIconsSelected: $iconViewModel.unifiedAppleIconsSelected
-            )
-
-            GenerationControlsView(
-                viewModel: iconViewModel
-            )
+            // Editor sidebar
+            if iconViewModel.showSidebar {
+                Divider()
+                IconEditorSidebarTabbed(
+                    viewModel: iconViewModel,
+                    sourceImage: $iconViewModel.sourceImage
+                )
+                .transition(.move(edge: .trailing))
+            }
         }
-        .padding(30)
+        .frame(minWidth: iconViewModel.showSidebar ? 880 : 600, minHeight: 550)
         .alert("Icon Generation Complete", isPresented: $iconViewModel.showCompletionAlert) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -103,11 +133,31 @@ struct InfoView: View {
 
             Divider()
 
+            Text("Editor Features:")
+                .font(.headline)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Label(
+                    "Basic: Adjust brightness, contrast, saturation, and more",
+                    systemImage: "slider.horizontal.3")
+                Label(
+                    "Advanced: Add borders, text overlays, change icon shape",
+                    systemImage: "wand.and.stars")
+                Label(
+                    "Background: Add custom backgrounds or padding", systemImage: "rectangle.fill")
+                Label(
+                    "Shape: Create rounded corners or circular icons",
+                    systemImage: "square.on.circle")
+            }
+            .padding(.leading)
+
+            Divider()
+
             Text("Instructions:")
                 .font(.headline)
 
             Text(
-                "1. Drag and drop an image or click to select a source image.\n2. Select the platforms you want to generate icons for.\n3. Toggle 'Generate unified Apple icons' to create a single folder with a unified Contents.json for all Apple platforms.\n4. Choose an output folder or let the app prompt you when generating.\n5. Click 'Generate Icons'.\n6. The generated icons will be saved to a timestamped folder within your selected output location."
+                "1. Drag and drop an image or click to select a source image.\n2. Use the editor panel to customize your icon's appearance.\n3. Select the platforms you want to generate icons for.\n4. Choose an output folder or let the app prompt you when generating.\n5. Click 'Generate Icons'.\n6. The generated icons will be saved to a timestamped folder within your selected output location."
             )
             .padding(.leading)
 
@@ -123,6 +173,6 @@ struct InfoView: View {
             }
         }
         .padding(30)
-        .frame(width: 500, height: 450)
+        .frame(width: 500, height: 550)
     }
 }
