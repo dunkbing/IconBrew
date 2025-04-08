@@ -132,7 +132,7 @@ class ContentsJsonGenerator {
         saveContentsJson(contentsJson, to: outputFolder.appendingPathComponent("Contents.json"))
     }
 
-    private func saveContentsJson(_ contentsJson: ContentsJson, to fileURL: URL) {
+    func saveContentsJson(_ contentsJson: ContentsJson, to fileURL: URL) {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
 

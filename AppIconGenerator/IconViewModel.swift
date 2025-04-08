@@ -22,6 +22,7 @@ class IconViewModel: ObservableObject {
     @Published var watchOSSelected = true
     @Published var androidSelected = true
     @Published var webSelected = true
+    @Published var unifiedAppleIconsSelected = false
 
     // Error handling
     @Published var errorMessage: String?
@@ -96,17 +97,33 @@ class IconViewModel: ObservableObject {
             DispatchQueue.global(qos: .userInitiated).async {
                 let iconGenerator = IconGenerator()
 
-                if self.iOSSelected {
-                    iconGenerator.generateIOSIcons(from: sourceImage, outputFolder: outputFolder)
-                }
+                if self.unifiedAppleIconsSelected
+                    && (self.iOSSelected || self.macOSSelected || self.watchOSSelected)
+                {
+                    // Generate unified Apple icons
+                    iconGenerator.generateUnifiedAppleIcons(
+                        from: sourceImage,
+                        outputFolder: outputFolder,
+                        generateiOS: self.iOSSelected,
+                        generatemacOS: self.macOSSelected,
+                        generatewatchOS: self.watchOSSelected
+                    )
+                } else {
+                    // Generate separate platform icons
+                    if self.iOSSelected {
+                        iconGenerator.generateIOSIcons(
+                            from: sourceImage, outputFolder: outputFolder)
+                    }
 
-                if self.macOSSelected {
-                    iconGenerator.generateMacOSIcons(from: sourceImage, outputFolder: outputFolder)
-                }
+                    if self.macOSSelected {
+                        iconGenerator.generateMacOSIcons(
+                            from: sourceImage, outputFolder: outputFolder)
+                    }
 
-                if self.watchOSSelected {
-                    iconGenerator.generateWatchOSIcons(
-                        from: sourceImage, outputFolder: outputFolder)
+                    if self.watchOSSelected {
+                        iconGenerator.generateWatchOSIcons(
+                            from: sourceImage, outputFolder: outputFolder)
+                    }
                 }
 
                 if self.androidSelected {

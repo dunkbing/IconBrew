@@ -37,7 +37,8 @@ struct ContentView: View {
                 macOSSelected: $iconViewModel.macOSSelected,
                 watchOSSelected: $iconViewModel.watchOSSelected,
                 androidSelected: $iconViewModel.androidSelected,
-                webSelected: $iconViewModel.webSelected
+                webSelected: $iconViewModel.webSelected,
+                unifiedAppleIconsSelected: $iconViewModel.unifiedAppleIconsSelected
             )
 
             GenerationControlsView(
@@ -106,7 +107,7 @@ struct InfoView: View {
                 .font(.headline)
 
             Text(
-                "1. Drag and drop an image or click to select a source image.\n2. Select the platforms you want to generate icons for.\n3. Click 'Generate Icons'.\n4. The generated icons will be saved to a folder that will open automatically."
+                "1. Drag and drop an image or click to select a source image.\n2. Select the platforms you want to generate icons for.\n3. Toggle 'Generate unified Apple icons' to create a single folder with a unified Contents.json for all Apple platforms.\n4. Click 'Generate Icons'.\n5. The generated icons will be saved to a folder that will open automatically."
             )
             .padding(.leading)
 
@@ -122,6 +123,6 @@ struct InfoView: View {
             }
         }
         .padding(30)
-        .frame(width: 500, height: 400)
+        .frame(width: 500, height: 450)
     }
 }
