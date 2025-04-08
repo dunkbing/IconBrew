@@ -107,7 +107,7 @@ struct InfoView: View {
                 .font(.headline)
 
             Text(
-                "1. Drag and drop an image or click to select a source image.\n2. Select the platforms you want to generate icons for.\n3. Toggle 'Generate unified Apple icons' to create a single folder with a unified Contents.json for all Apple platforms.\n4. Click 'Generate Icons'.\n5. The generated icons will be saved to a folder that will open automatically."
+                "1. Drag and drop an image or click to select a source image.\n2. Select the platforms you want to generate icons for.\n3. Toggle 'Generate unified Apple icons' to create a single folder with a unified Contents.json for all Apple platforms.\n4. Choose an output folder or let the app prompt you when generating.\n5. Click 'Generate Icons'.\n6. The generated icons will be saved to a timestamped folder within your selected output location."
             )
             .padding(.leading)
 

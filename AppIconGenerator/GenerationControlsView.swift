@@ -11,7 +11,37 @@ struct GenerationControlsView: View {
     @ObservedObject var viewModel: IconViewModel
 
     var body: some View {
-        VStack {
+        VStack(spacing: 12) {
+            HStack {
+                Text("Output Folder:")
+                    .font(.subheadline)
+
+                Button(action: viewModel.selectOutputFolder) {
+                    Text("Select")
+                        .fontWeight(.medium)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
+            .padding(.horizontal, 2)
+
+            if let selectedFolder = viewModel.selectedOutputFolder {
+                Text(selectedFolder.path)
+                    .font(.caption)
+                    .foregroundColor(.blue)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .onTapGesture {
+                        NSWorkspace.shared.open(selectedFolder)
+                    }
+            } else {
+                Text("Not selected")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
             Button(action: viewModel.generateIcons) {
                 Text(viewModel.generationComplete ? "Generate Again" : "Generate Icons")
                     .fontWeight(.semibold)

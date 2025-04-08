@@ -15,6 +15,7 @@ class IconViewModel: ObservableObject {
     @Published var generationComplete = false
     @Published var outputFolderURL: URL?
     @Published var showCompletionAlert = false
+    @Published var selectedOutputFolder: URL?
 
     // Platform toggles
     @Published var iOSSelected = true
@@ -43,6 +44,26 @@ class IconViewModel: ObservableObject {
                         self.generationComplete = false
                         completion(image)
                     }
+                }
+            }
+        }
+    }
+
+    func selectOutputFolder() {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.canCreateDirectories = true
+        panel.title = "Select Output Folder"
+        panel.message = "Choose a folder to save generated icons"
+
+        panel.begin { [weak self] response in
+            guard let self = self else { return }
+
+            if response == .OK, let url = panel.url {
+                DispatchQueue.main.async {
+                    self.selectedOutputFolder = url
                 }
             }
         }
@@ -79,16 +100,36 @@ class IconViewModel: ObservableObject {
             return
         }
 
+        if selectedOutputFolder == nil {
+            // If no output folder is selected, show folder picker
+            let panel = NSOpenPanel()
+            panel.allowsMultipleSelection = false
+            panel.canChooseDirectories = true
+            panel.canChooseFiles = false
+            panel.canCreateDirectories = true
+            panel.title = "Select Output Folder"
+            panel.message = "Choose a folder to save generated icons"
+
+            panel.begin { [weak self] response in
+                guard let self = self else { return }
+
+                if response == .OK, let url = panel.url {
+                    self.selectedOutputFolder = url
+                    self.proceedWithIconGeneration(sourceImage: sourceImage)
+                }
+            }
+        } else {
+            proceedWithIconGeneration(sourceImage: sourceImage)
+        }
+    }
+
+    private func proceedWithIconGeneration(sourceImage: NSImage) {
         isGenerating = true
         generationComplete = false
 
-        // Create a folder in Documents directory for better findability
-        let documentsDirectory = FileManager.default.urls(
-            for: .documentDirectory, in: .userDomainMask
-        ).first!
-        let outputFolder =
-            documentsDirectory
-            .appendingPathComponent("AppIcons-\(Int(Date().timeIntervalSince1970))")
+        // Create a subfolder within the selected output folder
+        let outputFolder = selectedOutputFolder!.appendingPathComponent(
+            "AppIcons-\(Int(Date().timeIntervalSince1970))")
 
         do {
             try FileManager.default.createDirectory(
@@ -149,7 +190,23 @@ class IconViewModel: ObservableObject {
         } catch {
             DispatchQueue.main.async {
                 self.isGenerating = false
-                self.errorMessage = "Error creating output directory: \(error.localizedDescription)"
+
+                // Try to provide a more user-friendly error message
+                let nsError = error as NSError
+                print(nsError)
+                if nsError.domain == NSCocoaErrorDomain
+                    && (nsError.code == NSFileWriteNoPermissionError
+                        || nsError.code == NSFileWriteVolumeReadOnlyError)
+                {
+                    self.errorMessage =
+                        "Permission denied: You don't have permission to write to the selected folder. Please choose a different folder."
+                } else if error.localizedDescription.contains("Permission denied") {
+                    self.errorMessage =
+                        "Permission denied: You don't have permission to write to the selected folder. Please choose a different folder."
+                } else {
+                    self.errorMessage =
+                        "Error creating output directory: \(error.localizedDescription)"
+                }
                 self.showError = true
             }
         }
