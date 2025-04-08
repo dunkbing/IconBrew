@@ -40,9 +40,12 @@ class IconViewModel: ObservableObject {
         }
     }
 
-    func loadDroppedImage(from providers: [NSItemProvider], completion: @escaping (NSImage?) -> Void) {
+    func loadDroppedImage(
+        from providers: [NSItemProvider], completion: @escaping (NSImage?) -> Void
+    ) {
         if let provider = providers.first {
-            provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
+            provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) {
+                data, error in
                 if let imageData = data, let droppedImage = NSImage(data: imageData) {
                     DispatchQueue.main.async {
                         self.sourceImage = droppedImage
@@ -65,7 +68,8 @@ class IconViewModel: ObservableObject {
             .appendingPathComponent("AppIcons-\(Int(Date().timeIntervalSince1970))")
 
         do {
-            try FileManager.default.createDirectory(at: outputFolder, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(
+                at: outputFolder, withIntermediateDirectories: true)
 
             // A background task to not block the UI
             DispatchQueue.global(qos: .userInitiated).async {
@@ -81,11 +85,13 @@ class IconViewModel: ObservableObject {
                 }
 
                 if self.watchOSSelected {
-                    iconGenerator.generateWatchOSIcons(from: sourceImage, outputFolder: outputFolder)
+                    iconGenerator.generateWatchOSIcons(
+                        from: sourceImage, outputFolder: outputFolder)
                 }
 
                 if self.androidSelected {
-                    iconGenerator.generateAndroidIcons(from: sourceImage, outputFolder: outputFolder)
+                    iconGenerator.generateAndroidIcons(
+                        from: sourceImage, outputFolder: outputFolder)
                 }
 
                 if self.webSelected {

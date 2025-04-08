@@ -42,4 +42,3 @@ struct HeaderView: View {
             .fontWeight(.bold)
     }
 }
-

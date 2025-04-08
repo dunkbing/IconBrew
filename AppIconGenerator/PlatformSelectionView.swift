@@ -13,12 +13,12 @@ struct PlatformSelectionView: View {
     @Binding var watchOSSelected: Bool
     @Binding var androidSelected: Bool
     @Binding var webSelected: Bool
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             Text("Select Target Platforms:")
                 .font(.headline)
-            
+
             HStack(spacing: 20) {
                 Toggle("iOS", isOn: $iOSSelected)
                 Toggle("macOS", isOn: $macOSSelected)

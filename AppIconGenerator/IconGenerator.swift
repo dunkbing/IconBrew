@@ -7,7 +7,6 @@
 
 import AppKit
 
-
 class IconGenerator {
     // MARK: - Platform-specific icon generation functions
     func generateIOSIcons(from sourceImage: NSImage, outputFolder: URL) {
@@ -29,18 +28,21 @@ class IconGenerator {
             ("iPad_76pt", 76),
             ("iPad_76pt@2x", 152),
             ("iPad_83.5pt@2x", 167),
-            ("App_Store_1024pt", 1024)
+            ("App_Store_1024pt", 1024),
         ]
-        
+
         let platformFolder = outputFolder.appendingPathComponent("iOS")
-        try? FileManager.default.createDirectory(at: platformFolder, withIntermediateDirectories: true)
-        
+        try? FileManager.default.createDirectory(
+            at: platformFolder, withIntermediateDirectories: true)
+
         for (name, size) in sizes {
-            let resizedImage = ImageUtility.resizeImage(sourceImage, toSize: CGSize(width: size, height: size))
-            ImageUtility.saveImage(resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
+            let resizedImage = ImageUtility.resizeImage(
+                sourceImage, toSize: CGSize(width: size, height: size))
+            ImageUtility.saveImage(
+                resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
         }
     }
-    
+
     func generateMacOSIcons(from sourceImage: NSImage, outputFolder: URL) {
         let sizes = [
             ("icon_16x16", 16),
@@ -52,18 +54,21 @@ class IconGenerator {
             ("icon_256x256", 256),
             ("icon_256x256@2x", 512),
             ("icon_512x512", 512),
-            ("icon_512x512@2x", 1024)
+            ("icon_512x512@2x", 1024),
         ]
-        
+
         let platformFolder = outputFolder.appendingPathComponent("macOS")
-        try? FileManager.default.createDirectory(at: platformFolder, withIntermediateDirectories: true)
-        
+        try? FileManager.default.createDirectory(
+            at: platformFolder, withIntermediateDirectories: true)
+
         for (name, size) in sizes {
-            let resizedImage = ImageUtility.resizeImage(sourceImage, toSize: CGSize(width: size, height: size))
-            ImageUtility.saveImage(resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
+            let resizedImage = ImageUtility.resizeImage(
+                sourceImage, toSize: CGSize(width: size, height: size))
+            ImageUtility.saveImage(
+                resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
         }
     }
-    
+
     func generateWatchOSIcons(from sourceImage: NSImage, outputFolder: URL) {
         let sizes = [
             ("AppIcon24x24@2x", 48),
@@ -75,18 +80,21 @@ class IconGenerator {
             ("AppIcon50x50@2x", 100),
             ("AppIcon86x86@2x", 172),
             ("AppIcon98x98@2x", 196),
-            ("AppIcon108x108@2x", 216)
+            ("AppIcon108x108@2x", 216),
         ]
-        
+
         let platformFolder = outputFolder.appendingPathComponent("watchOS")
-        try? FileManager.default.createDirectory(at: platformFolder, withIntermediateDirectories: true)
-        
+        try? FileManager.default.createDirectory(
+            at: platformFolder, withIntermediateDirectories: true)
+
         for (name, size) in sizes {
-            let resizedImage = ImageUtility.resizeImage(sourceImage, toSize: CGSize(width: size, height: size))
-            ImageUtility.saveImage(resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
+            let resizedImage = ImageUtility.resizeImage(
+                sourceImage, toSize: CGSize(width: size, height: size))
+            ImageUtility.saveImage(
+                resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
         }
     }
-    
+
     func generateAndroidIcons(from sourceImage: NSImage, outputFolder: URL) {
         let sizes = [
             ("mipmap-mdpi", 48),
@@ -94,28 +102,32 @@ class IconGenerator {
             ("mipmap-xhdpi", 96),
             ("mipmap-xxhdpi", 144),
             ("mipmap-xxxhdpi", 192),
-            ("playstore", 512)
+            ("playstore", 512),
         ]
-        
+
         let platformFolder = outputFolder.appendingPathComponent("Android")
-        try? FileManager.default.createDirectory(at: platformFolder, withIntermediateDirectories: true)
-        
+        try? FileManager.default.createDirectory(
+            at: platformFolder, withIntermediateDirectories: true)
+
         for (name, size) in sizes {
-            let resizedImage = ImageUtility.resizeImage(sourceImage, toSize: CGSize(width: size, height: size))
-            let filePath = name == "playstore" 
+            let resizedImage = ImageUtility.resizeImage(
+                sourceImage, toSize: CGSize(width: size, height: size))
+            let filePath =
+                name == "playstore"
                 ? platformFolder.appendingPathComponent("ic_launcher-playstore.png")
                 : platformFolder.appendingPathComponent("\(name)/ic_launcher.png")
-            
+
             // Create subdirectories for Android density buckets
             if name != "playstore" {
                 let densityFolder = platformFolder.appendingPathComponent(name)
-                try? FileManager.default.createDirectory(at: densityFolder, withIntermediateDirectories: true)
+                try? FileManager.default.createDirectory(
+                    at: densityFolder, withIntermediateDirectories: true)
             }
-            
+
             ImageUtility.saveImage(resizedImage, to: filePath)
         }
     }
-    
+
     func generateWebIcons(from sourceImage: NSImage, outputFolder: URL) {
         let sizes = [
             ("favicon", 16),
@@ -124,15 +136,17 @@ class IconGenerator {
             ("favicon", 64),
             ("apple-touch-icon", 180),
             ("icon", 192),
-            ("icon", 512)
+            ("icon", 512),
         ]
-        
+
         let platformFolder = outputFolder.appendingPathComponent("Web")
-        try? FileManager.default.createDirectory(at: platformFolder, withIntermediateDirectories: true)
-        
+        try? FileManager.default.createDirectory(
+            at: platformFolder, withIntermediateDirectories: true)
+
         for (name, size) in sizes {
-            let resizedImage = ImageUtility.resizeImage(sourceImage, toSize: CGSize(width: size, height: size))
-            
+            let resizedImage = ImageUtility.resizeImage(
+                sourceImage, toSize: CGSize(width: size, height: size))
+
             let filename: String
             if name == "favicon" && size <= 64 {
                 filename = "favicon-\(size)x\(size).png"
@@ -141,8 +155,9 @@ class IconGenerator {
             } else {
                 filename = "\(name)-\(size)x\(size).png"
             }
-            
-            ImageUtility.saveImage(resizedImage, to: platformFolder.appendingPathComponent(filename))
+
+            ImageUtility.saveImage(
+                resizedImage, to: platformFolder.appendingPathComponent(filename))
         }
     }
 }

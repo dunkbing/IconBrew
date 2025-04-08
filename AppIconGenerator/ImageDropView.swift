@@ -15,9 +15,10 @@ struct ImageDropView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)
-                .fill(sourceImage == nil
-                      ? Color.gray.opacity(0.2)
-                      : Color.gray.opacity(0.1))
+                .fill(
+                    sourceImage == nil
+                        ? Color.gray.opacity(0.2)
+                        : Color.gray.opacity(0.1))
 
             RoundedRectangle(cornerRadius: 12)
                 .stroke(

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GenerationControlsView: View {
     @ObservedObject var viewModel: IconViewModel
-    
+
     var body: some View {
         VStack {
             Button(action: viewModel.generateIcons) {
@@ -24,14 +24,14 @@ struct GenerationControlsView: View {
                     .foregroundColor(.white)
             }
             .disabled(viewModel.sourceImage == nil || viewModel.isGenerating)
-            
+
             if viewModel.isGenerating {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
                     .scaleEffect(0.8)
                     .padding(.top, 5)
             }
-            
+
             if let outputURL = viewModel.outputFolderURL, viewModel.generationComplete {
                 HStack {
                     Text("Icons saved to:")
