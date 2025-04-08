@@ -14,6 +14,7 @@ class IconViewModel: ObservableObject {
     @Published var isGenerating = false
     @Published var generationComplete = false
     @Published var outputFolderURL: URL?
+    @Published var showCompletionAlert = false
 
     // Platform toggles
     @Published var iOSSelected = true
@@ -21,6 +22,10 @@ class IconViewModel: ObservableObject {
     @Published var watchOSSelected = true
     @Published var androidSelected = true
     @Published var webSelected = true
+
+    // Error handling
+    @Published var errorMessage: String?
+    @Published var showError = false
 
     func selectImage(completion: @escaping (NSImage?) -> Void) {
         let panel = NSOpenPanel()
@@ -32,9 +37,11 @@ class IconViewModel: ObservableObject {
         panel.begin { response in
             if response == .OK, let url = panel.url {
                 if let image = NSImage(contentsOf: url) {
-                    self.sourceImage = image
-                    self.generationComplete = false
-                    completion(image)
+                    DispatchQueue.main.async {
+                        self.sourceImage = image
+                        self.generationComplete = false
+                        completion(image)
+                    }
                 }
             }
         }
@@ -52,6 +59,11 @@ class IconViewModel: ObservableObject {
                         self.generationComplete = false
                         completion(droppedImage)
                     }
+                } else if let error = error {
+                    DispatchQueue.main.async {
+                        self.errorMessage = "Failed to load image: \(error.localizedDescription)"
+                        self.showError = true
+                    }
                 }
             }
         }
@@ -60,22 +72,30 @@ class IconViewModel: ObservableObject {
     func generateIcons() {
         guard let sourceImage = sourceImage else { return }
 
+        if !iOSSelected && !macOSSelected && !watchOSSelected && !androidSelected && !webSelected {
+            self.errorMessage = "Please select at least one platform"
+            self.showError = true
+            return
+        }
+
         isGenerating = true
         generationComplete = false
 
-        // Create a temporary output directory
-        let outputFolder = URL(fileURLWithPath: NSTemporaryDirectory())
+        // Create a folder in Documents directory for better findability
+        let documentsDirectory = FileManager.default.urls(
+            for: .documentDirectory, in: .userDomainMask
+        ).first!
+        let outputFolder =
+            documentsDirectory
             .appendingPathComponent("AppIcons-\(Int(Date().timeIntervalSince1970))")
 
         do {
             try FileManager.default.createDirectory(
                 at: outputFolder, withIntermediateDirectories: true)
 
-            // A background task to not block the UI
             DispatchQueue.global(qos: .userInitiated).async {
                 let iconGenerator = IconGenerator()
 
-                // Generate icons for each selected platform
                 if self.iOSSelected {
                     iconGenerator.generateIOSIcons(from: sourceImage, outputFolder: outputFolder)
                 }
@@ -103,14 +123,18 @@ class IconViewModel: ObservableObject {
                     self.isGenerating = false
                     self.generationComplete = true
                     self.outputFolderURL = outputFolder
+                    self.showCompletionAlert = true
 
                     // Show the folder in Finder
                     NSWorkspace.shared.open(outputFolder)
                 }
             }
         } catch {
-            print("Error creating output directory: \(error)")
-            isGenerating = false
+            DispatchQueue.main.async {
+                self.isGenerating = false
+                self.errorMessage = "Error creating output directory: \(error.localizedDescription)"
+                self.showError = true
+            }
         }
     }
 }

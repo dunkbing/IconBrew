@@ -13,7 +13,7 @@ struct GenerationControlsView: View {
     var body: some View {
         VStack {
             Button(action: viewModel.generateIcons) {
-                Text(viewModel.generationComplete ? "Generated!" : "Generate Icons")
+                Text(viewModel.generationComplete ? "Generate Again" : "Generate Icons")
                     .fontWeight(.semibold)
                     .frame(width: 160)
                     .padding(.vertical, 8)
@@ -49,5 +49,10 @@ struct GenerationControlsView: View {
             }
         }
         .padding(.vertical)
+        .alert("Error", isPresented: $viewModel.showError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage ?? "An unknown error occurred")
+        }
     }
 }

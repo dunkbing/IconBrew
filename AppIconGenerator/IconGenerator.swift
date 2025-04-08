@@ -8,7 +8,6 @@
 import AppKit
 
 class IconGenerator {
-    // MARK: - Platform-specific icon generation functions
     func generateIOSIcons(from sourceImage: NSImage, outputFolder: URL) {
         let sizes = [
             ("iPhone_20pt@2x", 40),
@@ -41,6 +40,9 @@ class IconGenerator {
             ImageUtility.saveImage(
                 resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
         }
+
+        let jsonGenerator = ContentsJsonGenerator()
+        jsonGenerator.generateIOSContentsJson(outputFolder: platformFolder)
     }
 
     func generateMacOSIcons(from sourceImage: NSImage, outputFolder: URL) {
@@ -67,6 +69,9 @@ class IconGenerator {
             ImageUtility.saveImage(
                 resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
         }
+
+        let jsonGenerator = ContentsJsonGenerator()
+        jsonGenerator.generateMacOSContentsJson(outputFolder: platformFolder)
     }
 
     func generateWatchOSIcons(from sourceImage: NSImage, outputFolder: URL) {
@@ -93,6 +98,9 @@ class IconGenerator {
             ImageUtility.saveImage(
                 resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
         }
+
+        let jsonGenerator = ContentsJsonGenerator()
+        jsonGenerator.generateWatchOSContentsJson(outputFolder: platformFolder)
     }
 
     func generateAndroidIcons(from sourceImage: NSImage, outputFolder: URL) {
@@ -158,6 +166,42 @@ class IconGenerator {
 
             ImageUtility.saveImage(
                 resizedImage, to: platformFolder.appendingPathComponent(filename))
+        }
+
+        generateWebManifestJson(outputFolder: platformFolder)
+    }
+
+    private func generateWebManifestJson(outputFolder: URL) {
+        let manifest = """
+            {
+              "name": "My App",
+              "short_name": "App",
+              "icons": [
+                {
+                  "src": "icon-192x192.png",
+                  "sizes": "192x192",
+                  "type": "image/png"
+                },
+                {
+                  "src": "icon-512x512.png",
+                  "sizes": "512x512",
+                  "type": "image/png"
+                }
+              ],
+              "theme_color": "#ffffff",
+              "background_color": "#ffffff",
+              "display": "standalone"
+            }
+            """
+
+        do {
+            try manifest.write(
+                to: outputFolder.appendingPathComponent("manifest.json"),
+                atomically: true,
+                encoding: .utf8
+            )
+        } catch {
+            print("Error generating web manifest: \(error)")
         }
     }
 }
