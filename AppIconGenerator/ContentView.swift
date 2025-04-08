@@ -23,7 +23,7 @@ struct ContentView: View {
                 .buttonStyle(.plain)
                 .foregroundColor(.blue)
                 .sheet(isPresented: $showingInfo) {
-                    InfoView()
+                    InfoView(isPresented: $showingInfo)
                 }
             }
 
@@ -68,6 +68,8 @@ struct HeaderView: View {
 }
 
 struct InfoView: View {
+    @Binding var isPresented: Bool
+
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {
@@ -113,7 +115,7 @@ struct InfoView: View {
             HStack {
                 Spacer()
                 Button("Close") {
-                    NSApplication.shared.keyWindow?.close()
+                    isPresented = false
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
