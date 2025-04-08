@@ -15,14 +15,10 @@ struct GenerationControlsView: View {
             Button(action: viewModel.generateIcons) {
                 Text(viewModel.generationComplete ? "Generate Again" : "Generate Icons")
                     .fontWeight(.semibold)
-                    .frame(width: 160)
+                    .frame(minWidth: 160)
                     .padding(.vertical, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(viewModel.sourceImage == nil ? Color.gray : Color.blue)
-                    )
-                    .foregroundColor(.white)
             }
+            .buttonStyle(GenerateButtonStyle(isEnabled: viewModel.sourceImage != nil))
             .disabled(viewModel.sourceImage == nil || viewModel.isGenerating)
 
             if viewModel.isGenerating {
@@ -54,5 +50,21 @@ struct GenerationControlsView: View {
         } message: {
             Text(viewModel.errorMessage ?? "An unknown error occurred")
         }
+    }
+}
+
+struct GenerateButtonStyle: ButtonStyle {
+    var isEnabled: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(
+                        isEnabled
+                            ? (configuration.isPressed ? Color.blue.opacity(0.8) : Color.blue)
+                            : Color.gray)
+            )
+            .foregroundColor(.white)
     }
 }
