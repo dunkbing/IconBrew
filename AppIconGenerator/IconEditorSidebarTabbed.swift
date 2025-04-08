@@ -11,6 +11,7 @@ struct IconEditorSidebarTabbed: View {
     @ObservedObject var viewModel: IconViewModel
     @Binding var sourceImage: NSImage?
     @State private var selectedTab = 0
+    @State private var originalImage: NSImage?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -59,23 +60,18 @@ struct IconEditorSidebarTabbed: View {
 
                 Divider()
 
-                // Tab content
-                TabView(selection: $selectedTab) {
-                    // Basic editing tab
+                // Tab content using TabView with .page style for better performance
+                if selectedTab == 0 {
                     ScrollView {
                         BasicIconEditor(viewModel: viewModel, sourceImage: $sourceImage)
                             .padding()
                     }
-                    .tag(0)
-
-                    // Advanced editing tab
+                } else {
                     ScrollView {
                         AdvancedIconEditing(viewModel: viewModel, sourceImage: $sourceImage)
                             .padding()
                     }
-                    .tag(1)
                 }
-                //                .tabViewStyle(.page(indexDisplayMode: .never))
             }
         }
         .frame(width: 280)
@@ -83,7 +79,7 @@ struct IconEditorSidebarTabbed: View {
     }
 }
 
-// Split out the basic editing functionality into its own component
+// BasicIconEditor with fixed control interaction
 struct BasicIconEditor: View {
     @ObservedObject var viewModel: IconViewModel
     @Binding var sourceImage: NSImage?
@@ -94,7 +90,6 @@ struct BasicIconEditor: View {
     @State private var roundedCorners: Double = 0
     @State private var padding: Double = 0
     @State private var backgroundColor: Color = .clear
-    @State private var showColorPicker = false
     @State private var useCustomBackground = false
     @State private var applyTint = false
     @State private var tintColor: Color = .blue
@@ -112,16 +107,24 @@ struct BasicIconEditor: View {
                     .foregroundColor(.secondary)
 
                 SliderControl(value: $brightness, range: -0.5...0.5, label: "Brightness")
-                    .onChange(of: brightness) { _ in applyFilters() }
+                    .onChange(of: brightness) { newValue in
+                        applyFilters()
+                    }
 
                 SliderControl(value: $contrast, range: -0.5...0.5, label: "Contrast")
-                    .onChange(of: contrast) { _ in applyFilters() }
+                    .onChange(of: contrast) { newValue in
+                        applyFilters()
+                    }
 
                 SliderControl(value: $saturation, range: -1.0...1.0, label: "Saturation")
-                    .onChange(of: saturation) { _ in applyFilters() }
+                    .onChange(of: saturation) { newValue in
+                        applyFilters()
+                    }
 
                 SliderControl(value: $hue, range: -0.5...0.5, label: "Hue")
-                    .onChange(of: hue) { _ in applyFilters() }
+                    .onChange(of: hue) { newValue in
+                        applyFilters()
+                    }
             }
 
             Divider()
@@ -133,17 +136,25 @@ struct BasicIconEditor: View {
                     .foregroundColor(.secondary)
 
                 SliderControl(value: $roundedCorners, range: 0...60, label: "Rounded Corners")
-                    .onChange(of: roundedCorners) { _ in applyShapeChanges() }
+                    .onChange(of: roundedCorners) { newValue in
+                        applyShapeChanges()
+                    }
 
                 SliderControl(value: $padding, range: 0...60, label: "Padding")
-                    .onChange(of: padding) { _ in applyShapeChanges() }
+                    .onChange(of: padding) { newValue in
+                        applyShapeChanges()
+                    }
 
                 Toggle("Custom Background", isOn: $useCustomBackground)
-                    .onChange(of: useCustomBackground) { _ in applyShapeChanges() }
+                    .onChange(of: useCustomBackground) { newValue in
+                        applyShapeChanges()
+                    }
 
                 if useCustomBackground {
                     ColorPicker("Background Color", selection: $backgroundColor)
-                        .onChange(of: backgroundColor) { _ in applyShapeChanges() }
+                        .onChange(of: backgroundColor) { newValue in
+                            applyShapeChanges()
+                        }
                 }
             }
 
@@ -156,14 +167,20 @@ struct BasicIconEditor: View {
                     .foregroundColor(.secondary)
 
                 Toggle("Apply Tint", isOn: $applyTint)
-                    .onChange(of: applyTint) { _ in applyTintChanges() }
+                    .onChange(of: applyTint) { newValue in
+                        applyTintChanges()
+                    }
 
                 if applyTint {
                     ColorPicker("Tint Color", selection: $tintColor)
-                        .onChange(of: tintColor) { _ in applyTintChanges() }
+                        .onChange(of: tintColor) { newValue in
+                            applyTintChanges()
+                        }
 
                     SliderControl(value: $tintIntensity, range: 0...1, label: "Intensity")
-                        .onChange(of: tintIntensity) { _ in applyTintChanges() }
+                        .onChange(of: tintIntensity) { newValue in
+                            applyTintChanges()
+                        }
                 }
             }
 
@@ -176,7 +193,6 @@ struct BasicIconEditor: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
-                //                .buttonBorderShape(.capsule)
                 .tint(.red.opacity(0.8))
 
                 Spacer()
@@ -187,17 +203,17 @@ struct BasicIconEditor: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
-                //                .buttonBorderShape(.capsule)
             }
         }
         .onAppear {
             if let image = sourceImage {
-                originalImage = image.copyImage() as? NSImage
+                originalImage = image.copyImage()
             }
         }
         .onChange(of: sourceImage) { newImage in
-            if let image = newImage {
-                originalImage = image.copy() as? NSImage
+            // Only reset when source image changes from external source
+            if let image = newImage, originalImage == nil {
+                originalImage = image.copyImage()
                 resetControlValues()
             }
         }
@@ -208,12 +224,10 @@ struct BasicIconEditor: View {
     private func applyFilters() {
         guard let originalImage = originalImage else { return }
 
-        let tempImage = originalImage.copyImage() as? NSImage
+        let tempImage = originalImage.copyImage()
 
         // Apply filters in sequence using CIFilter
-        if let sourceImage = tempImage,
-            let cgImage = sourceImage.cgImage
-        {
+        if let cgImage = tempImage.cgImage {
             let ciImage = CIImage(cgImage: cgImage)
 
             // Create the filter chain
@@ -264,19 +278,24 @@ struct BasicIconEditor: View {
             if let cgImageResult = context.createCGImage(
                 currentCIImage, from: currentCIImage.extent)
             {
-                let resultImage = NSImage(cgImage: cgImageResult, size: sourceImage.size)
+                let resultImage = NSImage(cgImage: cgImageResult, size: tempImage.size)
 
                 // Apply shape changes on top of filters
-                self.sourceImage = resultImage
-                applyShapeChanges()
+                sourceImage = resultImage
+
+                if roundedCorners > 0 || padding > 0 || useCustomBackground || applyTint {
+                    applyShapeChanges()
+                }
             }
         }
     }
 
     private func applyShapeChanges() {
-        guard var currentImage = sourceImage?.copy() as? NSImage else { return }
+        guard let image = sourceImage else { return }
 
-        if useCustomBackground || padding > 0 || applyTint {
+        var currentImage = image.copyImage()
+
+        if useCustomBackground || padding > 0 {
             let imageSize = currentImage.size
             let targetSize = NSSize(
                 width: imageSize.width,
@@ -315,16 +334,47 @@ struct BasicIconEditor: View {
             currentImage = newImage
         }
 
+        // Apply rounded corners if needed
+        if roundedCorners > 0 {
+            currentImage = applyRoundedCorners(to: currentImage, radius: roundedCorners)
+        }
+
         // Apply tinting on top if needed
         if applyTint {
             applyTintToImage(currentImage)
         } else {
-            self.sourceImage = currentImage
+            sourceImage = currentImage
         }
     }
 
+    private func applyRoundedCorners(to image: NSImage, radius: Double) -> NSImage {
+        let imageSize = image.size
+        let resultImage = NSImage(size: imageSize)
+
+        resultImage.lockFocus()
+
+        // Create rounded rect path for clipping
+        let bezierPath = NSBezierPath(
+            roundedRect: NSRect(origin: .zero, size: imageSize),
+            xRadius: CGFloat(radius),
+            yRadius: CGFloat(radius))
+        bezierPath.addClip()
+
+        // Draw the original image
+        image.draw(in: NSRect(origin: .zero, size: imageSize))
+
+        resultImage.unlockFocus()
+        return resultImage
+    }
+
     private func applyTintChanges() {
-        applyFilters()  // Reapply the entire chain including shape changes
+        if let image = sourceImage {
+            if applyTint {
+                applyTintToImage(image)
+            } else {
+                applyFilters()  // Reapply the filter chain without tint
+            }
+        }
     }
 
     private func applyTintToImage(_ image: NSImage) {
@@ -346,18 +396,24 @@ struct BasicIconEditor: View {
 
         guard let blendOutput = blendFilter?.outputImage else { return }
 
-        // Blend the tinted image with the original based on intensity
-        let finalFilter = CIFilter(name: "CISourceOverCompositing")
-        finalFilter?.setValue(blendOutput.cropped(to: ciImage.extent), forKey: kCIInputImageKey)
-        finalFilter?.setValue(ciImage, forKey: kCIInputBackgroundImageKey)
+        // Control the intensity of the tint by blending with the original
+        let blend = CIFilter(name: "CIBlendWithMask")
+        blend?.setValue(blendOutput, forKey: kCIInputImageKey)
+        blend?.setValue(ciImage, forKey: kCIInputBackgroundImageKey)
 
-        guard let finalOutput = finalFilter?.outputImage else { return }
+        // Create a constant color filter for the mask
+        let maskGenerator = CIFilter(name: "CIConstantColorGenerator")
+        let maskColor = CIColor(red: tintIntensity, green: tintIntensity, blue: tintIntensity)
+        maskGenerator?.setValue(maskColor, forKey: kCIInputColorKey)
+        blend?.setValue(maskGenerator?.outputImage, forKey: kCIInputMaskImageKey)
+
+        guard let outputImage = blend?.outputImage else { return }
 
         // Convert back to NSImage
         let context = CIContext()
-        if let cgImageResult = context.createCGImage(finalOutput, from: finalOutput.extent) {
+        if let cgImageResult = context.createCGImage(outputImage, from: outputImage.extent) {
             let resultImage = NSImage(cgImage: cgImageResult, size: image.size)
-            self.sourceImage = resultImage
+            sourceImage = resultImage
         }
     }
 
@@ -378,7 +434,7 @@ struct BasicIconEditor: View {
     private func resetAllChanges() {
         resetControlValues()
         if let original = originalImage {
-            sourceImage = original.copyImage() as? NSImage
+            sourceImage = original.copyImage()
         }
     }
 }

@@ -14,10 +14,19 @@ extension NSImage {
     }
 
     func copyImage() -> NSImage {
-        let newImage = NSImage(size: size)
-        newImage.lockFocus()
-        self.draw(in: NSRect(origin: .zero, size: size))
-        newImage.unlockFocus()
-        return newImage
+        // Create a more reliable deep copy of the image
+        guard let tiffData = tiffRepresentation,
+            let imageRep = NSBitmapImageRep(data: tiffData)
+        else {
+            // Fallback if TIFF representation fails
+            let newImage = NSImage(size: size)
+            newImage.lockFocus()
+            self.draw(in: NSRect(origin: .zero, size: size))
+            newImage.unlockFocus()
+            return newImage
+        }
+
+        return NSImage(data: imageRep.representation(using: .png, properties: [:]) ?? Data())
+            ?? self
     }
 }

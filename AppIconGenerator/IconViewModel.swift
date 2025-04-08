@@ -30,10 +30,13 @@ class IconViewModel: ObservableObject {
     @Published var showError = false
 
     @Published var showSidebar = true
+
+    // Separate property for tracking edited image
     @Published var editedImage: NSImage?
 
     func updateEditedImage(_ image: NSImage?) {
-        self.editedImage = image
+        // This ensures we keep track of edited images separately from the source
+        self.editedImage = image?.copyImage()
     }
 
     func selectImage(completion: @escaping (NSImage?) -> Void) {
@@ -48,6 +51,7 @@ class IconViewModel: ObservableObject {
                 if let image = NSImage(contentsOf: url) {
                     DispatchQueue.main.async {
                         self.sourceImage = image
+                        self.editedImage = nil  // Reset edited image when new source is selected
                         self.generationComplete = false
                         completion(image)
                     }
@@ -85,6 +89,7 @@ class IconViewModel: ObservableObject {
                 if let imageData = data, let droppedImage = NSImage(data: imageData) {
                     DispatchQueue.main.async {
                         self.sourceImage = droppedImage
+                        self.editedImage = nil  // Reset edited image when new source is dropped
                         self.generationComplete = false
                         completion(droppedImage)
                     }
@@ -99,7 +104,8 @@ class IconViewModel: ObservableObject {
     }
 
     func generateIcons() {
-        guard let sourceImage = sourceImage else { return }
+        // Use editedImage if available, otherwise use sourceImage
+        guard let finalImage = editedImage ?? sourceImage else { return }
 
         if !iOSSelected && !macOSSelected && !watchOSSelected && !androidSelected && !webSelected {
             self.errorMessage = "Please select at least one platform"
@@ -122,11 +128,11 @@ class IconViewModel: ObservableObject {
 
                 if response == .OK, let url = panel.url {
                     self.selectedOutputFolder = url
-                    self.proceedWithIconGeneration(sourceImage: sourceImage)
+                    self.proceedWithIconGeneration(sourceImage: finalImage)
                 }
             }
         } else {
-            proceedWithIconGeneration(sourceImage: sourceImage)
+            proceedWithIconGeneration(sourceImage: finalImage)
         }
     }
 

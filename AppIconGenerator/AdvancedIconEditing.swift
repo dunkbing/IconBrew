@@ -31,6 +31,9 @@ struct AdvancedIconEditing: View {
     @ObservedObject var viewModel: IconViewModel
     @Binding var sourceImage: NSImage?
 
+    // Original image saved for resets
+    @State private var originalImage: NSImage?
+
     // Border properties
     @State private var addBorder = false
     @State private var borderWidth: Double = 4
@@ -71,7 +74,9 @@ struct AdvancedIconEditing: View {
                                 }
                             }
                             .pickerStyle(.segmented)
-                            .onChange(of: iconShape) { _ in applyChanges() }
+                            .onChange(of: iconShape) { newValue in
+                                applyChanges()
+                            }
 
                             if iconShape == .roundedSquare {
                                 VStack(alignment: .leading, spacing: 4) {
@@ -84,9 +89,10 @@ struct AdvancedIconEditing: View {
                                             .foregroundColor(.secondary)
                                     }
 
-                                    Slider(value: $customCornerRadius, in: 0...60) { _ in
-                                        applyChanges()
-                                    }
+                                    Slider(value: $customCornerRadius, in: 0...60)
+                                        .onChange(of: customCornerRadius) { newValue in
+                                            applyChanges()
+                                        }
                                 }
                             }
                         }
@@ -96,12 +102,16 @@ struct AdvancedIconEditing: View {
                         // Border section
                         Group {
                             Toggle("Add Border", isOn: $addBorder)
-                                .onChange(of: addBorder) { _ in applyChanges() }
+                                .onChange(of: addBorder) { newValue in
+                                    applyChanges()
+                                }
 
                             if addBorder {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ColorPicker("Border Color", selection: $borderColor)
-                                        .onChange(of: borderColor) { _ in applyChanges() }
+                                        .onChange(of: borderColor) { newValue in
+                                            applyChanges()
+                                        }
 
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack {
@@ -113,9 +123,10 @@ struct AdvancedIconEditing: View {
                                                 .foregroundColor(.secondary)
                                         }
 
-                                        Slider(value: $borderWidth, in: 1...15) { _ in
-                                            applyChanges()
-                                        }
+                                        Slider(value: $borderWidth, in: 1...15)
+                                            .onChange(of: borderWidth) { newValue in
+                                                applyChanges()
+                                            }
                                     }
                                 }
                             }
@@ -134,12 +145,14 @@ struct AdvancedIconEditing: View {
                                     Text(overlay.rawValue).tag(overlay)
                                 }
                             }
-                            .onChange(of: overlayType) { _ in applyChanges() }
+                            .onChange(of: overlayType) { newValue in
+                                applyChanges()
+                            }
 
                             if overlayType == .custom {
                                 TextField("Custom Text", text: $customOverlayText)
                                     .textFieldStyle(.roundedBorder)
-                                    .onChange(of: customOverlayText) { _ in
+                                    .onChange(of: customOverlayText) { newValue in
                                         if !customOverlayText.isEmpty {
                                             applyChanges()
                                         }
@@ -149,7 +162,9 @@ struct AdvancedIconEditing: View {
                             if overlayType != .none {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ColorPicker("Text Color", selection: $overlayColor)
-                                        .onChange(of: overlayColor) { _ in applyChanges() }
+                                        .onChange(of: overlayColor) { newValue in
+                                            applyChanges()
+                                        }
 
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack {
@@ -161,9 +176,10 @@ struct AdvancedIconEditing: View {
                                                 .foregroundColor(.secondary)
                                         }
 
-                                        Slider(value: $overlayFontSize, in: 8...40) { _ in
-                                            applyChanges()
-                                        }
+                                        Slider(value: $overlayFontSize, in: 8...40)
+                                            .onChange(of: overlayFontSize) { newValue in
+                                                applyChanges()
+                                            }
                                     }
 
                                     VStack(alignment: .leading, spacing: 4) {
@@ -176,9 +192,10 @@ struct AdvancedIconEditing: View {
                                                 .foregroundColor(.secondary)
                                         }
 
-                                        Slider(value: $overlayRotation, in: -90...90) { _ in
-                                            applyChanges()
-                                        }
+                                        Slider(value: $overlayRotation, in: -90...90)
+                                            .onChange(of: overlayRotation) { newValue in
+                                                applyChanges()
+                                            }
                                     }
 
                                     VStack(alignment: .leading, spacing: 4) {
@@ -191,9 +208,10 @@ struct AdvancedIconEditing: View {
                                                 .foregroundColor(.secondary)
                                         }
 
-                                        Slider(value: $overlayPosition, in: 0...1) { _ in
-                                            applyChanges()
-                                        }
+                                        Slider(value: $overlayPosition, in: 0...1)
+                                            .onChange(of: overlayPosition) { newValue in
+                                                applyChanges()
+                                            }
                                     }
 
                                     VStack(alignment: .leading, spacing: 4) {
@@ -206,9 +224,10 @@ struct AdvancedIconEditing: View {
                                                 .foregroundColor(.secondary)
                                         }
 
-                                        Slider(value: $overlayOpacity, in: 0...1) { _ in
-                                            applyChanges()
-                                        }
+                                        Slider(value: $overlayOpacity, in: 0...1)
+                                            .onChange(of: overlayOpacity) { newValue in
+                                                applyChanges()
+                                            }
                                     }
                                 }
                             }
@@ -229,6 +248,7 @@ struct AdvancedIconEditing: View {
 
                             Button("Apply") {
                                 applyChanges()
+                                viewModel.updateEditedImage(sourceImage)
                             }
                             .buttonStyle(.borderedProminent)
                             .controlSize(.small)
@@ -245,19 +265,26 @@ struct AdvancedIconEditing: View {
                 }
             }
         }
-        .frame(width: 250)
-        .padding()
-        .background(Color(.windowBackgroundColor).opacity(0.3))
         .onAppear {
-            resetAdvancedEditing()
+            if let image = sourceImage {
+                originalImage = image.copyImage()
+            }
+        }
+        .onChange(of: sourceImage) { newImage in
+            // Only update original image reference if it's a new source image (not an edit)
+            if let image = newImage, originalImage == nil {
+                originalImage = image.copyImage()
+                resetAdvancedEditing()
+            }
         }
     }
 
-    // Functions moved outside of body
-    func applyChanges() {
-        guard let originalImage = sourceImage?.copy() as? NSImage else { return }
+    // MARK: - Methods
 
-        // Start with a clean copy of the image
+    func applyChanges() {
+        guard let originalImage = self.originalImage?.copyImage() else { return }
+
+        // Start with a clean copy of the original image
         var processedImage = originalImage
 
         // Calculate size information
@@ -378,7 +405,7 @@ struct AdvancedIconEditing: View {
 
         resultImage.unlockFocus()
 
-        // Update the source image
+        // Update the source image with our changes
         sourceImage = resultImage
     }
 
@@ -395,5 +422,10 @@ struct AdvancedIconEditing: View {
         overlayColor = .red
         overlayFontSize = 18
         overlayRotation = -45
+
+        // Reset the image to the original
+        if let original = originalImage {
+            sourceImage = original.copyImage()
+        }
     }
 }

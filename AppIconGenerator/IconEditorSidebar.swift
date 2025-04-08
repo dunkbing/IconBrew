@@ -370,6 +370,7 @@ struct SliderControl: View {
 
             HStack {
                 Slider(value: $value, in: range)
+                    .onChange(of: value) { _ in }
 
                 Button(action: {
                     value = 0
