@@ -79,7 +79,7 @@ struct IconEditorSidebarTabbed: View {
     }
 }
 
-// BasicIconEditor with fixed control interaction
+// BasicIconEditor with debounced control interaction
 struct BasicIconEditor: View {
     @ObservedObject var viewModel: IconViewModel
     @Binding var sourceImage: NSImage?
@@ -98,6 +98,9 @@ struct BasicIconEditor: View {
     // Store original image for reset functionality
     @State private var originalImage: NSImage?
 
+    // Debouncer for color changes
+    private let colorDebouncer = Debouncer(delay: 0.3)
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Image adjustments
@@ -106,25 +109,33 @@ struct BasicIconEditor: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
-                SliderControl(value: $brightness, range: -0.5...0.5, label: "Brightness")
-                    .onChange(of: brightness) { newValue in
-                        applyFilters()
-                    }
+                DebouncedSliderControl(
+                    value: $brightness,
+                    range: -0.5...0.5,
+                    label: "Brightness",
+                    onValueChanged: applyFilters
+                )
 
-                SliderControl(value: $contrast, range: -0.5...0.5, label: "Contrast")
-                    .onChange(of: contrast) { newValue in
-                        applyFilters()
-                    }
+                DebouncedSliderControl(
+                    value: $contrast,
+                    range: -0.5...0.5,
+                    label: "Contrast",
+                    onValueChanged: applyFilters
+                )
 
-                SliderControl(value: $saturation, range: -1.0...1.0, label: "Saturation")
-                    .onChange(of: saturation) { newValue in
-                        applyFilters()
-                    }
+                DebouncedSliderControl(
+                    value: $saturation,
+                    range: -1.0...1.0,
+                    label: "Saturation",
+                    onValueChanged: applyFilters
+                )
 
-                SliderControl(value: $hue, range: -0.5...0.5, label: "Hue")
-                    .onChange(of: hue) { newValue in
-                        applyFilters()
-                    }
+                DebouncedSliderControl(
+                    value: $hue,
+                    range: -0.5...0.5,
+                    label: "Hue",
+                    onValueChanged: applyFilters
+                )
             }
 
             Divider()
@@ -135,25 +146,31 @@ struct BasicIconEditor: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
-                SliderControl(value: $roundedCorners, range: 0...60, label: "Rounded Corners")
-                    .onChange(of: roundedCorners) { newValue in
-                        applyShapeChanges()
-                    }
+                DebouncedSliderControl(
+                    value: $roundedCorners,
+                    range: 0...60,
+                    label: "Rounded Corners",
+                    onValueChanged: applyShapeChanges
+                )
 
-                SliderControl(value: $padding, range: 0...60, label: "Padding")
-                    .onChange(of: padding) { newValue in
-                        applyShapeChanges()
-                    }
+                DebouncedSliderControl(
+                    value: $padding,
+                    range: 0...60,
+                    label: "Padding",
+                    onValueChanged: applyShapeChanges
+                )
 
                 Toggle("Custom Background", isOn: $useCustomBackground)
-                    .onChange(of: useCustomBackground) { newValue in
+                    .onChange(of: useCustomBackground) { _ in
                         applyShapeChanges()
                     }
 
                 if useCustomBackground {
                     ColorPicker("Background Color", selection: $backgroundColor)
-                        .onChange(of: backgroundColor) { newValue in
-                            applyShapeChanges()
+                        .onChange(of: backgroundColor) { _ in
+                            colorDebouncer.debounce {
+                                applyShapeChanges()
+                            }
                         }
                 }
             }
@@ -167,20 +184,22 @@ struct BasicIconEditor: View {
                     .foregroundColor(.secondary)
 
                 Toggle("Apply Tint", isOn: $applyTint)
-                    .onChange(of: applyTint) { newValue in
-                        applyTintChanges()
-                    }
+                    .onChange(of: applyTint) { _ in applyTintChanges() }
 
                 if applyTint {
                     ColorPicker("Tint Color", selection: $tintColor)
-                        .onChange(of: tintColor) { newValue in
-                            applyTintChanges()
+                        .onChange(of: tintColor) { _ in
+                            colorDebouncer.debounce {
+                                applyTintChanges()
+                            }
                         }
 
-                    SliderControl(value: $tintIntensity, range: 0...1, label: "Intensity")
-                        .onChange(of: tintIntensity) { newValue in
-                            applyTintChanges()
-                        }
+                    DebouncedSliderControl(
+                        value: $tintIntensity,
+                        range: 0...1,
+                        label: "Intensity",
+                        onValueChanged: applyTintChanges
+                    )
                 }
             }
 

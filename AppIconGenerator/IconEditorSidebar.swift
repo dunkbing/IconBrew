@@ -63,21 +63,33 @@ struct IconEditorSidebar: View {
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
 
-                            SliderControl(
-                                value: $brightness, range: -0.5...0.5, label: "Brightness"
+                            DebouncedSliderControl(
+                                value: $brightness,
+                                range: -0.5...0.5,
+                                label: "Brightness",
+                                onValueChanged: applyFilters
                             )
-                            .onChange(of: brightness) { _ in applyFilters() }
 
-                            SliderControl(value: $contrast, range: -0.5...0.5, label: "Contrast")
-                                .onChange(of: contrast) { _ in applyFilters() }
-
-                            SliderControl(
-                                value: $saturation, range: -1.0...1.0, label: "Saturation"
+                            DebouncedSliderControl(
+                                value: $contrast,
+                                range: -0.5...0.5,
+                                label: "Contrast",
+                                onValueChanged: applyFilters
                             )
-                            .onChange(of: saturation) { _ in applyFilters() }
 
-                            SliderControl(value: $hue, range: -0.5...0.5, label: "Hue")
-                                .onChange(of: hue) { _ in applyFilters() }
+                            DebouncedSliderControl(
+                                value: $saturation,
+                                range: -1.0...1.0,
+                                label: "Saturation",
+                                onValueChanged: applyFilters
+                            )
+
+                            DebouncedSliderControl(
+                                value: $hue,
+                                range: -0.5...0.5,
+                                label: "Hue",
+                                onValueChanged: applyFilters
+                            )
                         }
 
                         Divider()
@@ -88,20 +100,32 @@ struct IconEditorSidebar: View {
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
 
-                            SliderControl(
-                                value: $roundedCorners, range: 0...60, label: "Rounded Corners"
+                            DebouncedSliderControl(
+                                value: $roundedCorners,
+                                range: 0...60,
+                                label: "Rounded Corners",
+                                onValueChanged: applyShapeChanges
                             )
-                            .onChange(of: roundedCorners) { _ in applyShapeChanges() }
 
-                            SliderControl(value: $padding, range: 0...60, label: "Padding")
-                                .onChange(of: padding) { _ in applyShapeChanges() }
+                            DebouncedSliderControl(
+                                value: $padding,
+                                range: 0...60,
+                                label: "Padding",
+                                onValueChanged: applyShapeChanges
+                            )
 
                             Toggle("Custom Background", isOn: $useCustomBackground)
                                 .onChange(of: useCustomBackground) { _ in applyShapeChanges() }
 
                             if useCustomBackground {
                                 ColorPicker("Background Color", selection: $backgroundColor)
-                                    .onChange(of: backgroundColor) { _ in applyShapeChanges() }
+                                    .onChange(of: backgroundColor) { _ in
+                                        // Use debouncer for color changes
+                                        let debouncer = Debouncer(delay: 0.2)
+                                        debouncer.debounce {
+                                            applyShapeChanges()
+                                        }
+                                    }
                             }
                         }
 
@@ -118,12 +142,20 @@ struct IconEditorSidebar: View {
 
                             if applyTint {
                                 ColorPicker("Tint Color", selection: $tintColor)
-                                    .onChange(of: tintColor) { _ in applyTintChanges() }
+                                    .onChange(of: tintColor) { _ in
+                                        // Use debouncer for color changes
+                                        let debouncer = Debouncer(delay: 0.2)
+                                        debouncer.debounce {
+                                            applyTintChanges()
+                                        }
+                                    }
 
-                                SliderControl(
-                                    value: $tintIntensity, range: 0...1, label: "Intensity"
+                                DebouncedSliderControl(
+                                    value: $tintIntensity,
+                                    range: 0...1,
+                                    label: "Intensity",
+                                    onValueChanged: applyTintChanges
                                 )
-                                .onChange(of: tintIntensity) { _ in applyTintChanges() }
                             }
                         }
 
@@ -348,39 +380,6 @@ struct IconEditorSidebar: View {
         resetControlValues()
         if let original = originalImage {
             sourceImage = original.copy() as? NSImage
-        }
-    }
-}
-
-struct SliderControl: View {
-    @Binding var value: Double
-    var range: ClosedRange<Double>
-    var label: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(label)
-                    .font(.caption)
-                Spacer()
-                Text(String(format: "%.2f", value))
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-
-            HStack {
-                Slider(value: $value, in: range)
-                    .onChange(of: value) { _ in }
-
-                Button(action: {
-                    value = 0
-                }) {
-                    Image(systemName: "arrow.counterclockwise")
-                        .font(.caption)
-                }
-                .buttonStyle(.borderless)
-                .foregroundColor(.secondary)
-            }
         }
     }
 }

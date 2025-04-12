@@ -52,6 +52,10 @@ struct AdvancedIconEditing: View {
     @State private var iconShape: IconShape = .roundedSquare
     @State private var customCornerRadius: Double = 20
 
+    // Debouncers
+    private let colorDebouncer = Debouncer(delay: 0.3)
+    private let textDebouncer = Debouncer(delay: 0.5)
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Preview header
@@ -89,10 +93,12 @@ struct AdvancedIconEditing: View {
                                             .foregroundColor(.secondary)
                                     }
 
-                                    Slider(value: $customCornerRadius, in: 0...60)
-                                        .onChange(of: customCornerRadius) { newValue in
-                                            applyChanges()
-                                        }
+                                    DebouncedSliderControl(
+                                        value: $customCornerRadius,
+                                        range: 0...60,
+                                        label: "",
+                                        onValueChanged: applyChanges
+                                    )
                                 }
                             }
                         }
@@ -110,7 +116,9 @@ struct AdvancedIconEditing: View {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ColorPicker("Border Color", selection: $borderColor)
                                         .onChange(of: borderColor) { newValue in
-                                            applyChanges()
+                                            colorDebouncer.debounce {
+                                                applyChanges()
+                                            }
                                         }
 
                                     VStack(alignment: .leading, spacing: 4) {
@@ -123,10 +131,12 @@ struct AdvancedIconEditing: View {
                                                 .foregroundColor(.secondary)
                                         }
 
-                                        Slider(value: $borderWidth, in: 1...15)
-                                            .onChange(of: borderWidth) { newValue in
-                                                applyChanges()
-                                            }
+                                        DebouncedSliderControl(
+                                            value: $borderWidth,
+                                            range: 1...15,
+                                            label: "",
+                                            onValueChanged: applyChanges
+                                        )
                                     }
                                 }
                             }
@@ -154,7 +164,9 @@ struct AdvancedIconEditing: View {
                                     .textFieldStyle(.roundedBorder)
                                     .onChange(of: customOverlayText) { newValue in
                                         if !customOverlayText.isEmpty {
-                                            applyChanges()
+                                            textDebouncer.debounce {
+                                                applyChanges()
+                                            }
                                         }
                                     }
                             }
@@ -163,7 +175,9 @@ struct AdvancedIconEditing: View {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ColorPicker("Text Color", selection: $overlayColor)
                                         .onChange(of: overlayColor) { newValue in
-                                            applyChanges()
+                                            colorDebouncer.debounce {
+                                                applyChanges()
+                                            }
                                         }
 
                                     VStack(alignment: .leading, spacing: 4) {
@@ -176,10 +190,12 @@ struct AdvancedIconEditing: View {
                                                 .foregroundColor(.secondary)
                                         }
 
-                                        Slider(value: $overlayFontSize, in: 8...40)
-                                            .onChange(of: overlayFontSize) { newValue in
-                                                applyChanges()
-                                            }
+                                        DebouncedSliderControl(
+                                            value: $overlayFontSize,
+                                            range: 8...40,
+                                            label: "",
+                                            onValueChanged: applyChanges
+                                        )
                                     }
 
                                     VStack(alignment: .leading, spacing: 4) {
@@ -192,10 +208,12 @@ struct AdvancedIconEditing: View {
                                                 .foregroundColor(.secondary)
                                         }
 
-                                        Slider(value: $overlayRotation, in: -90...90)
-                                            .onChange(of: overlayRotation) { newValue in
-                                                applyChanges()
-                                            }
+                                        DebouncedSliderControl(
+                                            value: $overlayRotation,
+                                            range: -90...90,
+                                            label: "",
+                                            onValueChanged: applyChanges
+                                        )
                                     }
 
                                     VStack(alignment: .leading, spacing: 4) {
@@ -208,10 +226,12 @@ struct AdvancedIconEditing: View {
                                                 .foregroundColor(.secondary)
                                         }
 
-                                        Slider(value: $overlayPosition, in: 0...1)
-                                            .onChange(of: overlayPosition) { newValue in
-                                                applyChanges()
-                                            }
+                                        DebouncedSliderControl(
+                                            value: $overlayPosition,
+                                            range: 0...1,
+                                            label: "",
+                                            onValueChanged: applyChanges
+                                        )
                                     }
 
                                     VStack(alignment: .leading, spacing: 4) {
@@ -224,10 +244,12 @@ struct AdvancedIconEditing: View {
                                                 .foregroundColor(.secondary)
                                         }
 
-                                        Slider(value: $overlayOpacity, in: 0...1)
-                                            .onChange(of: overlayOpacity) { newValue in
-                                                applyChanges()
-                                            }
+                                        DebouncedSliderControl(
+                                            value: $overlayOpacity,
+                                            range: 0...1,
+                                            label: "",
+                                            onValueChanged: applyChanges
+                                        )
                                     }
                                 }
                             }
