@@ -1,5 +1,5 @@
 //
-//  UnifiedIconEditor.swift
+//  IconEditor.swift
 //  AppIconGenerator
 //
 //  Created by Bùi Đặng Bình on 13/4/25.
@@ -7,7 +7,15 @@
 
 import SwiftUI
 
-struct UnifiedIconEditor: View {
+enum IconShape: String, CaseIterable, Identifiable {
+    case square = "Square"
+    case roundedSquare = "Rounded"
+    case circle = "Circle"
+
+    var id: String { self.rawValue }
+}
+
+struct IconEditor: View {
     @ObservedObject var viewModel: IconViewModel
 
     // Store original image for reset functionality

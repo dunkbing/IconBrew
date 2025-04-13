@@ -13,7 +13,7 @@ struct IconEditorSidebar: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            UnifiedIconEditor(viewModel: viewModel)
+            IconEditor(viewModel: viewModel)
                 .padding(.top, sourceImage == nil ? 16 : 0)
         }
         .frame(width: 280)
