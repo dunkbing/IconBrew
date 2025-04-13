@@ -45,10 +45,7 @@ struct ContentView: View {
                     }
                 }
 
-                ImageDropView(
-                    sourceImage: $iconViewModel.sourceImage,
-                    isImageDragging: $iconViewModel.isImageDragging
-                )
+                ImageDropView(viewModel: iconViewModel)
 
                 PlatformSelectionView(
                     iOSSelected: $iconViewModel.iOSSelected,

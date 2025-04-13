@@ -10,6 +10,7 @@ import UniformTypeIdentifiers
 
 class IconViewModel: ObservableObject {
     @Published var sourceImage: NSImage?
+    @Published var originalImage: NSImage?
     @Published var isImageDragging = false
     @Published var isGenerating = false
     @Published var generationComplete = false
@@ -48,9 +49,11 @@ class IconViewModel: ObservableObject {
         panel.begin { response in
             if response == .OK, let url = panel.url {
                 if let image = NSImage(contentsOf: url) {
+                    print("selected image", image.size)
                     DispatchQueue.main.async {
                         self.sourceImage = image
-                        self.editedImage = nil  // Reset edited image when new source is selected
+                        self.originalImage = image
+                        self.editedImage = nil
                         self.generationComplete = false
                         completion(image)
                     }

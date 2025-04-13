@@ -9,7 +9,6 @@ import SwiftUI
 
 struct UnifiedIconEditor: View {
     @ObservedObject var viewModel: IconViewModel
-    @Binding var sourceImage: NSImage?
 
     // Store original image for reset functionality
     @State private var originalImage: NSImage?
@@ -32,7 +31,7 @@ struct UnifiedIconEditor: View {
 
     // Shape
     @State private var iconShape: IconShape = .roundedSquare
-    @State private var cornerRadiusPercentage: Double = 10
+    @State private var cornerRadiusPercentage: Double = 0
 
     // Border
     @State private var addBorder = false
@@ -52,7 +51,7 @@ struct UnifiedIconEditor: View {
                 .font(.headline)
                 .padding(.bottom, 4)
 
-            if sourceImage == nil {
+            if viewModel.sourceImage == nil {
                 VStack {
                     Spacer()
                     Text("Upload an image to start editing")
@@ -221,7 +220,6 @@ struct UnifiedIconEditor: View {
 
                         Divider()
 
-                        // Action buttons - Only Reset button now
                         HStack {
                             Button("Reset") {
                                 resetAllChanges()
@@ -237,20 +235,17 @@ struct UnifiedIconEditor: View {
             }
         }
         .onAppear {
-            if let image = sourceImage {
-                originalImage = image.copyImage()
+            if let image = viewModel.sourceImage {
+                viewModel.originalImage = image.copyImage()
             }
         }
-        .onChange(of: sourceImage) { newImage in
-            if let image = newImage, originalImage == nil {
-                originalImage = image.copyImage()
-                resetControlValues()
-            }
+        .onChange(of: viewModel.originalImage) { _ in
+            resetControlValues()
         }
     }
 
     func applyChanges() {
-        guard let originalImage = self.originalImage?.copyImage() else { return }
+        guard let originalImage = viewModel.originalImage?.copyImage() else { return }
 
         // Start with a copy of the original image for filters
         var processedImage = originalImage
@@ -269,7 +264,7 @@ struct UnifiedIconEditor: View {
         processedImage = applyShapeAndBorder(to: processedImage)
 
         // Update the source image with our changes
-        sourceImage = processedImage
+        viewModel.sourceImage = processedImage
 
         // Update the edited image in the view model
         viewModel.updateEditedImage(processedImage)
@@ -474,7 +469,7 @@ struct UnifiedIconEditor: View {
 
         // Reset Shape & Background
         iconShape = .roundedSquare
-        cornerRadiusPercentage = 10
+        cornerRadiusPercentage = 0
         paddingPercentage = 0
         backgroundColor = .clear
         useCustomBackground = false
@@ -489,8 +484,7 @@ struct UnifiedIconEditor: View {
 
     private func resetAllChanges() {
         resetControlValues()
-        if let original = originalImage {
-            sourceImage = original.copyImage()
+        if let original = viewModel.originalImage {
             viewModel.updateEditedImage(original.copyImage())
         }
     }

@@ -9,35 +9,34 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct ImageDropView: View {
-    @Binding var sourceImage: NSImage?
-    @Binding var isImageDragging: Bool
+    @ObservedObject var viewModel: IconViewModel
     @State private var isHovering = false
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)
                 .fill(
-                    sourceImage == nil
+                    viewModel.sourceImage == nil
                         ? Color.gray.opacity(0.2)
                         : Color.gray.opacity(0.1)
                 )
-                .animation(.easeInOut, value: sourceImage != nil)
+                .animation(.easeInOut, value: viewModel.sourceImage != nil)
 
             RoundedRectangle(cornerRadius: 12)
                 .stroke(
-                    isImageDragging
+                    viewModel.isImageDragging
                         ? Color.blue
                         : (isHovering ? Color.blue.opacity(0.5) : Color.gray.opacity(0.3)),
                     style: StrokeStyle(
-                        lineWidth: isImageDragging ? 2 : (isHovering ? 1.5 : 1),
+                        lineWidth: viewModel.isImageDragging ? 2 : (isHovering ? 1.5 : 1),
                         dash: [6],
                         dashPhase: 0
                     )
                 )
-                .animation(.easeInOut, value: isImageDragging)
+                .animation(.easeInOut, value: viewModel.isImageDragging)
                 .animation(.easeInOut, value: isHovering)
 
-            if let image = sourceImage {
+            if let image = viewModel.sourceImage {
                 VStack {
                     Image(nsImage: image)
                         .resizable()
@@ -70,18 +69,17 @@ struct ImageDropView: View {
         }
         .frame(height: 240)
         .onTapGesture {
-            let viewModel = IconViewModel()
             viewModel.selectImage { newImage in
-                sourceImage = newImage
+                viewModel.sourceImage = newImage
             }
         }
         .onHover { hovering in
             isHovering = hovering
         }
-        .onDrop(of: [UTType.image.identifier], isTargeted: $isImageDragging) { providers in
-            let viewModel = IconViewModel()
+        .onDrop(of: [UTType.image.identifier], isTargeted: $viewModel.isImageDragging) {
+            providers in
             viewModel.loadDroppedImage(from: providers) { newImage in
-                sourceImage = newImage
+                viewModel.sourceImage = newImage
             }
             return true
         }
