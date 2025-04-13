@@ -493,7 +493,8 @@ struct IconEditor: View {
     private func resetAllChanges() {
         resetControlValues()
         if let original = viewModel.originalImage {
-            viewModel.updateEditedImage(original.copyImage())
+            viewModel.updateEditedImage(nil)
+            viewModel.sourceImage = original.copyImage()
         }
     }
 }
