@@ -21,7 +21,7 @@ struct UnifiedIconEditor: View {
     @State private var hue: Double = 0
 
     // Background & Shape controls
-    @State private var paddingPercentage: Double = 0  // Percentage of the image's smaller dimension
+    @State private var paddingPercentage: Double = 0
     @State private var backgroundColor: Color = .clear
     @State private var useCustomBackground = false
 
@@ -30,11 +30,11 @@ struct UnifiedIconEditor: View {
     @State private var tintColor: Color = .blue
     @State private var tintIntensity: Double = 0.5
 
-    // Shape properties
+    // Shape
     @State private var iconShape: IconShape = .roundedSquare
-    @State private var cornerRadiusPercentage: Double = 10  // Percentage of the image's smaller dimension
+    @State private var cornerRadiusPercentage: Double = 10
 
-    // Border properties
+    // Border
     @State private var addBorder = false
     @State private var borderWidth: Double = 4
     @State private var borderColor: Color = .blue
@@ -242,15 +242,12 @@ struct UnifiedIconEditor: View {
             }
         }
         .onChange(of: sourceImage) { newImage in
-            // Only update original image reference if it's a new source image (not an edit)
             if let image = newImage, originalImage == nil {
                 originalImage = image.copyImage()
                 resetControlValues()
             }
         }
     }
-
-    // MARK: - Methods
 
     func applyChanges() {
         guard let originalImage = self.originalImage?.copyImage() else { return }

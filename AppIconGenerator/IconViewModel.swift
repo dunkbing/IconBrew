@@ -35,7 +35,6 @@ class IconViewModel: ObservableObject {
     @Published var editedImage: NSImage?
 
     func updateEditedImage(_ image: NSImage?) {
-        // This ensures we keep track of edited images separately from the source
         self.editedImage = image?.copyImage()
     }
 
