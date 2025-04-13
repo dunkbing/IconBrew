@@ -60,20 +60,6 @@ struct UnifiedIconEditor: View {
                     Spacer()
                 }
             } else {
-                // Preview
-                HStack {
-                    Spacer()
-                    if let image = sourceImage {
-                        Image(nsImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 120, height: 120)
-                            .shadow(radius: 1)
-                    }
-                    Spacer()
-                }
-                .padding(.bottom, 12)
-
                 Divider()
 
                 ScrollView {
@@ -235,7 +221,7 @@ struct UnifiedIconEditor: View {
 
                         Divider()
 
-                        // Action buttons
+                        // Action buttons - Only Reset button now
                         HStack {
                             Button("Reset") {
                                 resetAllChanges()
@@ -243,15 +229,6 @@ struct UnifiedIconEditor: View {
                             .buttonStyle(.borderedProminent)
                             .controlSize(.small)
                             .tint(.red.opacity(0.8))
-
-                            Spacer()
-
-                            Button("Apply") {
-                                // Current image is already applied through editing
-                                viewModel.updateEditedImage(sourceImage)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .controlSize(.small)
                         }
                         .padding(.top, 4)
                     }
@@ -296,6 +273,9 @@ struct UnifiedIconEditor: View {
 
         // Update the source image with our changes
         sourceImage = processedImage
+
+        // Update the edited image in the view model
+        viewModel.updateEditedImage(processedImage)
     }
 
     private func applyBasicFilters(to image: NSImage) -> NSImage {
@@ -514,6 +494,7 @@ struct UnifiedIconEditor: View {
         resetControlValues()
         if let original = originalImage {
             sourceImage = original.copyImage()
+            viewModel.updateEditedImage(original.copyImage())
         }
     }
 }

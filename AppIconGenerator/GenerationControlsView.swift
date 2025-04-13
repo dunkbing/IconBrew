@@ -43,7 +43,7 @@ struct GenerationControlsView: View {
             }
 
             Button(action: viewModel.generateIcons) {
-                Text(viewModel.generationComplete ? "Generate Again" : "Generate Icons")
+                Text("Generate Icons")
                     .fontWeight(.semibold)
                     .frame(minWidth: 160)
                     .padding(.vertical, 8)
