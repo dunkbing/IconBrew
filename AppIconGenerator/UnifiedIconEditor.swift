@@ -21,7 +21,7 @@ struct UnifiedIconEditor: View {
     @State private var hue: Double = 0
 
     // Background & Shape controls
-    @State private var padding: Double = 0
+    @State private var paddingPercentage: Double = 0  // Percentage of the image's smaller dimension
     @State private var backgroundColor: Color = .clear
     @State private var useCustomBackground = false
 
@@ -32,30 +32,19 @@ struct UnifiedIconEditor: View {
 
     // Shape properties
     @State private var iconShape: IconShape = .roundedSquare
-    @State private var customCornerRadius: Double = 20
+    @State private var cornerRadiusPercentage: Double = 10  // Percentage of the image's smaller dimension
 
     // Border properties
     @State private var addBorder = false
     @State private var borderWidth: Double = 4
     @State private var borderColor: Color = .blue
 
-    // Overlay properties
-    @State private var overlayType: OverlayType = .none
-    @State private var customOverlayText = ""
-    @State private var overlayPosition: Double = 0.5  // 0.0 - 1.0 (top to bottom)
-    @State private var overlayOpacity: Double = 0.8
-    @State private var overlayColor: Color = .red
-    @State private var overlayFontSize: Double = 18
-    @State private var overlayRotation: Double = -45
-
     // Control section states
     @State private var isBasicExpanded = true
     @State private var isShapeExpanded = true
-    @State private var isOverlayExpanded = false
 
     // Debouncers
-    private let colorDebouncer = Debouncer(delay: 0.3)
-    private let textDebouncer = Debouncer(delay: 0.5)
+    private let debouncer = Debouncer(delay: 0.3)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -129,7 +118,7 @@ struct UnifiedIconEditor: View {
                                     if applyTint {
                                         ColorPicker("Tint Color", selection: $tintColor)
                                             .onChange(of: tintColor) { _ in
-                                                colorDebouncer.debounce {
+                                                debouncer.debounce {
                                                     applyChanges()
                                                 }
                                             }
@@ -179,18 +168,18 @@ struct UnifiedIconEditor: View {
 
                                     if iconShape == .roundedSquare {
                                         DebouncedSliderControl(
-                                            value: $customCornerRadius,
-                                            range: 0...60,
-                                            label: "Corner Radius",
+                                            value: $cornerRadiusPercentage,
+                                            range: 0...50,  // Up to 50% of smaller dimension
+                                            label: "Corner Radius (%)",
                                             onValueChanged: applyChanges
                                         )
                                     }
 
                                     // Padding control
                                     DebouncedSliderControl(
-                                        value: $padding,
-                                        range: 0...60,
-                                        label: "Padding",
+                                        value: $paddingPercentage,
+                                        range: 0...25,  // Up to 25% of smaller dimension
+                                        label: "Padding (%)",
                                         onValueChanged: applyChanges
                                     )
 
@@ -203,7 +192,7 @@ struct UnifiedIconEditor: View {
                                     if addBorder {
                                         ColorPicker("Border Color", selection: $borderColor)
                                             .onChange(of: borderColor) { _ in
-                                                colorDebouncer.debounce {
+                                                debouncer.debounce {
                                                     applyChanges()
                                                 }
                                             }
@@ -225,7 +214,7 @@ struct UnifiedIconEditor: View {
                                     if useCustomBackground {
                                         ColorPicker("Background Color", selection: $backgroundColor)
                                             .onChange(of: backgroundColor) { _ in
-                                                colorDebouncer.debounce {
+                                                debouncer.debounce {
                                                     applyChanges()
                                                 }
                                             }
@@ -238,84 +227,6 @@ struct UnifiedIconEditor: View {
                                     Image(systemName: "square.on.circle")
                                         .foregroundColor(.secondary)
                                     Text("Shape & Background")
-                                        .font(.subheadline)
-                                        .foregroundColor(.primary)
-                                }
-                            }
-                        )
-
-                        Divider()
-
-                        // MARK: - Text Overlay Section
-                        DisclosureGroup(
-                            isExpanded: $isOverlayExpanded,
-                            content: {
-                                VStack(alignment: .leading, spacing: 12) {
-                                    Picker("Overlay Type", selection: $overlayType) {
-                                        ForEach(OverlayType.allCases) { overlay in
-                                            Text(overlay.rawValue).tag(overlay)
-                                        }
-                                    }
-                                    .onChange(of: overlayType) { _ in
-                                        applyChanges()
-                                    }
-
-                                    if overlayType == .custom {
-                                        TextField("Custom Text", text: $customOverlayText)
-                                            .textFieldStyle(.roundedBorder)
-                                            .onChange(of: customOverlayText) { _ in
-                                                if !customOverlayText.isEmpty {
-                                                    textDebouncer.debounce {
-                                                        applyChanges()
-                                                    }
-                                                }
-                                            }
-                                    }
-
-                                    if overlayType != .none {
-                                        ColorPicker("Text Color", selection: $overlayColor)
-                                            .onChange(of: overlayColor) { _ in
-                                                colorDebouncer.debounce {
-                                                    applyChanges()
-                                                }
-                                            }
-
-                                        DebouncedSliderControl(
-                                            value: $overlayFontSize,
-                                            range: 8...40,
-                                            label: "Font Size",
-                                            onValueChanged: applyChanges
-                                        )
-
-                                        DebouncedSliderControl(
-                                            value: $overlayRotation,
-                                            range: -90...90,
-                                            label: "Rotation",
-                                            onValueChanged: applyChanges
-                                        )
-
-                                        DebouncedSliderControl(
-                                            value: $overlayPosition,
-                                            range: 0...1,
-                                            label: "Position",
-                                            onValueChanged: applyChanges
-                                        )
-
-                                        DebouncedSliderControl(
-                                            value: $overlayOpacity,
-                                            range: 0...1,
-                                            label: "Opacity",
-                                            onValueChanged: applyChanges
-                                        )
-                                    }
-                                }
-                                .padding(.top, 8)
-                            },
-                            label: {
-                                HStack {
-                                    Image(systemName: "textformat")
-                                        .foregroundColor(.secondary)
-                                    Text("Text Overlay")
                                         .font(.subheadline)
                                         .foregroundColor(.primary)
                                 }
@@ -488,12 +399,16 @@ struct UnifiedIconEditor: View {
     private func applyShapeAndBorder(to image: NSImage) -> NSImage {
         let imageSize = image.size
         let targetSize = imageSize
+        let smallerDimension = min(targetSize.width, targetSize.height)
+
+        // Calculate actual padding and corner radius in points
+        let actualPadding = (paddingPercentage / 100) * smallerDimension
+        let actualCornerRadius = (cornerRadiusPercentage / 100) * smallerDimension
 
         // Create a new image context
         let resultImage = NSImage(size: targetSize)
         resultImage.lockFocus()
 
-        let context = NSGraphicsContext.current?.cgContext
         let rect = NSRect(origin: .zero, size: targetSize)
 
         // Draw background if needed
@@ -504,12 +419,12 @@ struct UnifiedIconEditor: View {
 
         // Calculate padding if needed
         let paddedRect: NSRect
-        if padding > 0 {
+        if paddingPercentage > 0 {
             paddedRect = NSRect(
-                x: padding,
-                y: padding,
-                width: targetSize.width - (padding * 2),
-                height: targetSize.height - (padding * 2)
+                x: actualPadding,
+                y: actualPadding,
+                width: targetSize.width - (actualPadding * 2),
+                height: targetSize.height - (actualPadding * 2)
             )
         } else {
             paddedRect = rect
@@ -526,7 +441,7 @@ struct UnifiedIconEditor: View {
             } else if iconShape == .roundedSquare {
                 // Create rounded rect clipping path
                 path.appendRoundedRect(
-                    paddedRect, xRadius: customCornerRadius, yRadius: customCornerRadius)
+                    paddedRect, xRadius: actualCornerRadius, yRadius: actualCornerRadius)
             }
 
             path.addClip()
@@ -555,7 +470,7 @@ struct UnifiedIconEditor: View {
                 borderPath.appendOval(in: borderRect)
             } else if iconShape == .roundedSquare {
                 borderPath.appendRoundedRect(
-                    borderRect, xRadius: customCornerRadius, yRadius: customCornerRadius)
+                    borderRect, xRadius: actualCornerRadius, yRadius: actualCornerRadius)
             } else {
                 borderPath.appendRect(borderRect)
             }
@@ -564,65 +479,6 @@ struct UnifiedIconEditor: View {
             NSColor(borderColor).setStroke()
             borderPath.lineWidth = borderWidth
             borderPath.stroke()
-        }
-
-        // Add text overlay if needed
-        if overlayType != .none {
-            let overlayText: String
-            switch overlayType {
-            case .beta:
-                overlayText = "BETA"
-            case .dev:
-                overlayText = "DEV"
-            case .alpha:
-                overlayText = "ALPHA"
-            case .staging:
-                overlayText = "STAGING"
-            case .test:
-                overlayText = "TEST"
-            case .custom:
-                overlayText = customOverlayText
-            default:
-                overlayText = ""
-            }
-
-            if !overlayText.isEmpty {
-                // Create attributed string
-                let font = NSFont.systemFont(ofSize: overlayFontSize, weight: .bold)
-                let attributes: [NSAttributedString.Key: Any] = [
-                    .font: font,
-                    .foregroundColor: NSColor(overlayColor).withAlphaComponent(overlayOpacity),
-                ]
-
-                let attrString = NSAttributedString(string: overlayText, attributes: attributes)
-                let textSize = attrString.size()
-
-                // Calculate position
-                let centerX = targetSize.width / 2
-                let centerY = targetSize.height * (1 - overlayPosition)
-
-                // Save graphics state for rotation
-                context?.saveGState()
-
-                // Translate to the center of text position
-                context?.translateBy(x: centerX, y: centerY)
-
-                // Rotate context
-                context?.rotate(by: CGFloat(overlayRotation) * .pi / 180)
-
-                // Draw text centered at origin
-                let textRect = NSRect(
-                    x: -textSize.width / 2,
-                    y: -textSize.height / 2,
-                    width: textSize.width,
-                    height: textSize.height
-                )
-
-                attrString.draw(in: textRect)
-
-                // Restore graphics state
-                context?.restoreGState()
-            }
         }
 
         resultImage.unlockFocus()
@@ -641,27 +497,17 @@ struct UnifiedIconEditor: View {
 
         // Reset Shape & Background
         iconShape = .roundedSquare
-        customCornerRadius = 20
-        padding = 0
+        cornerRadiusPercentage = 10
+        paddingPercentage = 0
         backgroundColor = .clear
         useCustomBackground = false
         addBorder = false
         borderWidth = 4
         borderColor = .blue
 
-        // Reset Text Overlay
-        overlayType = .none
-        customOverlayText = ""
-        overlayPosition = 0.5
-        overlayOpacity = 0.8
-        overlayColor = .red
-        overlayFontSize = 18
-        overlayRotation = -45
-
         // Reset UI state
         isBasicExpanded = true
         isShapeExpanded = true
-        isOverlayExpanded = false
     }
 
     private func resetAllChanges() {
