@@ -65,10 +65,9 @@ struct ContentView: View {
             }
             .padding(30)
 
-            // Editor sidebar
             if iconViewModel.showSidebar {
                 Divider()
-                IconEditorSidebarTabbed(
+                IconEditorSidebar(
                     viewModel: iconViewModel,
                     sourceImage: $iconViewModel.sourceImage
                 )
