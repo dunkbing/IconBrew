@@ -17,6 +17,5 @@ struct AppIconGenerator: App {
                     NSWindow.allowsAutomaticWindowTabbing = false
                 }
         }
-        .windowStyle(HiddenTitleBarWindowStyle())
     }
 }

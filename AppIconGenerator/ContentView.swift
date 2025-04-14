@@ -15,35 +15,7 @@ struct ContentView: View {
         HStack(spacing: 0) {
             // Main content
             VStack(spacing: 20) {
-                HStack {
-                    HeaderView()
-                    Spacer()
-
-                    // Toggle sidebar button
-                    Button(action: {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            iconViewModel.showSidebar.toggle()
-                        }
-                    }) {
-                        Image(
-                            systemName: iconViewModel.showSidebar ? "sidebar.right" : "sidebar.left"
-                        )
-                        .font(.system(size: 18))
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundColor(.blue)
-                    .help(iconViewModel.showSidebar ? "Hide Editor" : "Show Editor")
-
-                    Button(action: { showingInfo = true }) {
-                        Image(systemName: "info.circle")
-                            .font(.system(size: 18))
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundColor(.blue)
-                    .sheet(isPresented: $showingInfo) {
-                        InfoView(isPresented: $showingInfo)
-                    }
-                }
+                HeaderView()
 
                 ImageDropView(viewModel: iconViewModel)
 
@@ -72,10 +44,34 @@ struct ContentView: View {
             }
         }
         .frame(minWidth: iconViewModel.showSidebar ? 880 : 600, minHeight: 550)
+        .toolbar {
+            ToolbarItem(placement: .automatic) {
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        iconViewModel.showSidebar.toggle()
+                    }
+                }) {
+                    Image(systemName: iconViewModel.showSidebar ? "sidebar.right" : "sidebar.left")
+                        .font(.system(size: 16))
+                }
+                .help(iconViewModel.showSidebar ? "Hide Editor" : "Show Editor")
+            }
+
+            ToolbarItem(placement: .automatic) {
+                Button(action: { showingInfo = true }) {
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 16))
+                }
+                .help("About App Icon Generator")
+            }
+        }
         .alert("Icon Generation Complete", isPresented: $iconViewModel.showCompletionAlert) {
             Button("OK", role: .cancel) {}
         } message: {
             Text("Icons have been saved to the output folder.")
+        }
+        .sheet(isPresented: $showingInfo) {
+            InfoView(isPresented: $showingInfo)
         }
     }
 }
