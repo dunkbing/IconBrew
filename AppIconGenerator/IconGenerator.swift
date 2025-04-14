@@ -8,6 +8,55 @@
 import AppKit
 
 class IconGenerator {
+    private func adjustSizeForRetina(size: Int) -> Int {
+        // Explicitly halve the requested size to counteract Retina scaling
+        // This ensures a file named "icon_16x16.png" will actually be 16x16 pixels
+        return size / 2
+    }
+
+    func generateMacOSIcons(from sourceImage: NSImage, outputFolder: URL) {
+        let sizes = [
+            ("icon_16x16", 16),
+            ("icon_16x16@2x", 32),
+            ("icon_32x32", 32),
+            ("icon_32x32@2x", 64),
+            ("icon_128x128", 128),
+            ("icon_128x128@2x", 256),
+            ("icon_256x256", 256),
+            ("icon_256x256@2x", 512),
+            ("icon_512x512", 512),
+            ("icon_512x512@2x", 1024),
+        ]
+
+        let platformFolder = outputFolder.appendingPathComponent("macOS")
+        try? FileManager.default.createDirectory(
+            at: platformFolder, withIntermediateDirectories: true)
+
+        for (name, size) in sizes {
+            // Generate an icon with exact pixel dimensions
+            if let iconData = ImageUtility.createIconWithExactSize(sourceImage, pixelSize: size) {
+                let fileURL = platformFolder.appendingPathComponent("\(name).png")
+
+                // Create parent directory if needed
+                let directory = fileURL.deletingLastPathComponent()
+                try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+
+                // Write the data directly
+                do {
+                    try iconData.write(to: fileURL)
+                    print("Saved icon \(name).png with exact size \(size)x\(size)")
+                } catch {
+                    print("Error saving icon: \(error)")
+                }
+            }
+        }
+
+        let jsonGenerator = ContentsJsonGenerator()
+        jsonGenerator.generateMacOSContentsJson(outputFolder: platformFolder)
+    }
+
+    // Update other platform methods similarly
+    // For example, iOS icons:
     func generateIOSIcons(from sourceImage: NSImage, outputFolder: URL) {
         let sizes = [
             ("iPhone_20pt@2x", 40),
@@ -35,43 +84,25 @@ class IconGenerator {
             at: platformFolder, withIntermediateDirectories: true)
 
         for (name, size) in sizes {
-            let resizedImage = ImageUtility.resizeImage(
-                sourceImage, toSize: CGSize(width: size, height: size))
-            ImageUtility.saveImage(
-                resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
+            // Generate an icon with exact pixel dimensions
+            if let iconData = ImageUtility.createIconWithExactSize(sourceImage, pixelSize: size) {
+                let fileURL = platformFolder.appendingPathComponent("\(name).png")
+
+                // Create parent directory if needed
+                let directory = fileURL.deletingLastPathComponent()
+                try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+
+                // Write the data directly
+                do {
+                    try iconData.write(to: fileURL)
+                } catch {
+                    print("Error saving icon: \(error)")
+                }
+            }
         }
 
         let jsonGenerator = ContentsJsonGenerator()
         jsonGenerator.generateIOSContentsJson(outputFolder: platformFolder)
-    }
-
-    func generateMacOSIcons(from sourceImage: NSImage, outputFolder: URL) {
-        let sizes = [
-            ("icon_16x16", 16),
-            ("icon_16x16@2x", 32),
-            ("icon_32x32", 32),
-            ("icon_32x32@2x", 64),
-            ("icon_128x128", 128),
-            ("icon_128x128@2x", 256),
-            ("icon_256x256", 256),
-            ("icon_256x256@2x", 512),
-            ("icon_512x512", 512),
-            ("icon_512x512@2x", 1024),
-        ]
-
-        let platformFolder = outputFolder.appendingPathComponent("macOS")
-        try? FileManager.default.createDirectory(
-            at: platformFolder, withIntermediateDirectories: true)
-
-        for (name, size) in sizes {
-            let resizedImage = ImageUtility.resizeImage(
-                sourceImage, toSize: CGSize(width: size, height: size))
-            ImageUtility.saveImage(
-                resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
-        }
-
-        let jsonGenerator = ContentsJsonGenerator()
-        jsonGenerator.generateMacOSContentsJson(outputFolder: platformFolder)
     }
 
     func generateWatchOSIcons(from sourceImage: NSImage, outputFolder: URL) {
@@ -93,10 +124,20 @@ class IconGenerator {
             at: platformFolder, withIntermediateDirectories: true)
 
         for (name, size) in sizes {
-            let resizedImage = ImageUtility.resizeImage(
-                sourceImage, toSize: CGSize(width: size, height: size))
-            ImageUtility.saveImage(
-                resizedImage, to: platformFolder.appendingPathComponent("\(name).png"))
+            if let iconData = ImageUtility.createIconWithExactSize(sourceImage, pixelSize: size) {
+                let fileURL = platformFolder.appendingPathComponent("\(name).png")
+
+                // Create parent directory if needed
+                let directory = fileURL.deletingLastPathComponent()
+                try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+
+                // Write the data directly
+                do {
+                    try iconData.write(to: fileURL)
+                } catch {
+                    print("Error saving icon: \(error)")
+                }
+            }
         }
 
         let jsonGenerator = ContentsJsonGenerator()
@@ -142,13 +183,16 @@ class IconGenerator {
 
             for (name, size, idiom, scale, dimensions) in iosSizes {
                 let resizedImage = ImageUtility.resizeImage(
-                    sourceImage, toSize: CGSize(width: size, height: size))
+                    sourceImage,
+                    toSize: CGSize(width: size, height: size)
+                )
+                let filename = "\(name).png"
                 ImageUtility.saveImage(
-                    resizedImage, to: unifiedFolder.appendingPathComponent("\(name).png"))
+                    resizedImage, to: unifiedFolder.appendingPathComponent(filename))
 
                 allIcons.append(
                     IconFileReference(
-                        filename: "\(name).png",
+                        filename: filename,
                         idiom: idiom,
                         scale: scale,
                         size: dimensions))
@@ -172,13 +216,16 @@ class IconGenerator {
 
             for (name, size, idiom, scale, dimensions) in macOSSizes {
                 let resizedImage = ImageUtility.resizeImage(
-                    sourceImage, toSize: CGSize(width: size, height: size))
+                    sourceImage,
+                    toSize: CGSize(width: size, height: size)
+                )
+                let filename = "\(name).png"
                 ImageUtility.saveImage(
-                    resizedImage, to: unifiedFolder.appendingPathComponent("\(name).png"))
+                    resizedImage, to: unifiedFolder.appendingPathComponent(filename))
 
                 allIcons.append(
                     IconFileReference(
-                        filename: "\(name).png",
+                        filename: filename,
                         idiom: idiom,
                         scale: scale,
                         size: dimensions))
@@ -202,13 +249,16 @@ class IconGenerator {
 
             for (name, size, idiom, scale, dimensions) in watchOSSizes {
                 let resizedImage = ImageUtility.resizeImage(
-                    sourceImage, toSize: CGSize(width: size, height: size))
+                    sourceImage,
+                    toSize: CGSize(width: size, height: size)
+                )
+                let filename = "\(name).png"
                 ImageUtility.saveImage(
-                    resizedImage, to: unifiedFolder.appendingPathComponent("\(name).png"))
+                    resizedImage, to: unifiedFolder.appendingPathComponent(filename))
 
                 allIcons.append(
                     IconFileReference(
-                        filename: "\(name).png",
+                        filename: filename,
                         idiom: idiom,
                         scale: scale,
                         size: dimensions))
@@ -243,7 +293,9 @@ class IconGenerator {
 
         for (name, size) in sizes {
             let resizedImage = ImageUtility.resizeImage(
-                sourceImage, toSize: CGSize(width: size, height: size))
+                sourceImage,
+                toSize: CGSize(width: size, height: size)
+            )
             let filePath =
                 name == "playstore"
                 ? platformFolder.appendingPathComponent("ic_launcher-playstore.png")
@@ -277,7 +329,9 @@ class IconGenerator {
 
         for (name, size) in sizes {
             let resizedImage = ImageUtility.resizeImage(
-                sourceImage, toSize: CGSize(width: size, height: size))
+                sourceImage,
+                toSize: CGSize(width: size, height: size)
+            )
 
             let filename: String
             if name == "favicon" && size <= 64 {

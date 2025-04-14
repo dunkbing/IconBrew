@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		C3775C7D2DA54A7C005E8108 /* AppIconGenerator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppIconGenerator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3775C7D2DA54A7C005E8108 /* IconBrew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IconBrew.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -40,7 +40,7 @@
 		C3775C7E2DA54A7C005E8108 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C3775C7D2DA54A7C005E8108 /* AppIconGenerator.app */,
+				C3775C7D2DA54A7C005E8108 /* IconBrew.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C3775C7C2DA54A7C005E8108 /* AppIconGenerator */ = {
+		C3775C7C2DA54A7C005E8108 /* IconBrew */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C3775C8C2DA54A7E005E8108 /* Build configuration list for PBXNativeTarget "AppIconGenerator" */;
+			buildConfigurationList = C3775C8C2DA54A7E005E8108 /* Build configuration list for PBXNativeTarget "IconBrew" */;
 			buildPhases = (
 				C3775C792DA54A7C005E8108 /* Sources */,
 				C3775C7A2DA54A7C005E8108 /* Frameworks */,
@@ -63,11 +63,11 @@
 			fileSystemSynchronizedGroups = (
 				C3775C7F2DA54A7C005E8108 /* AppIconGenerator */,
 			);
-			name = AppIconGenerator;
+			name = IconBrew;
 			packageProductDependencies = (
 			);
 			productName = AppIconGenerator;
-			productReference = C3775C7D2DA54A7C005E8108 /* AppIconGenerator.app */;
+			productReference = C3775C7D2DA54A7C005E8108 /* IconBrew.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C3775C782DA54A7C005E8108 /* Build configuration list for PBXProject "AppIconGenerator" */;
+			buildConfigurationList = C3775C782DA54A7C005E8108 /* Build configuration list for PBXProject "IconBrew" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C3775C7C2DA54A7C005E8108 /* AppIconGenerator */,
+				C3775C7C2DA54A7C005E8108 /* IconBrew */,
 			);
 		};
 /* End PBXProject section */
@@ -257,6 +257,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Icon Brew";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -264,7 +266,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = db99.dev.AppIconGenerator;
+				PRODUCT_BUNDLE_IDENTIFIER = db99.dev.IconBrew;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -285,6 +287,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Icon Brew";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -292,7 +296,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = db99.dev.AppIconGenerator;
+				PRODUCT_BUNDLE_IDENTIFIER = db99.dev.IconBrew;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -302,7 +306,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C3775C782DA54A7C005E8108 /* Build configuration list for PBXProject "AppIconGenerator" */ = {
+		C3775C782DA54A7C005E8108 /* Build configuration list for PBXProject "IconBrew" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C3775C8A2DA54A7E005E8108 /* Debug */,
@@ -311,7 +315,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C3775C8C2DA54A7E005E8108 /* Build configuration list for PBXNativeTarget "AppIconGenerator" */ = {
+		C3775C8C2DA54A7E005E8108 /* Build configuration list for PBXNativeTarget "IconBrew" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C3775C8D2DA54A7E005E8108 /* Debug */,
