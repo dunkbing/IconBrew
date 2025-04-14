@@ -39,7 +39,8 @@ class IconGenerator {
 
                 // Create parent directory if needed
                 let directory = fileURL.deletingLastPathComponent()
-                try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+                try? FileManager.default.createDirectory(
+                    at: directory, withIntermediateDirectories: true)
 
                 // Write the data directly
                 do {
@@ -90,7 +91,8 @@ class IconGenerator {
 
                 // Create parent directory if needed
                 let directory = fileURL.deletingLastPathComponent()
-                try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+                try? FileManager.default.createDirectory(
+                    at: directory, withIntermediateDirectories: true)
 
                 // Write the data directly
                 do {
@@ -129,7 +131,8 @@ class IconGenerator {
 
                 // Create parent directory if needed
                 let directory = fileURL.deletingLastPathComponent()
-                try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+                try? FileManager.default.createDirectory(
+                    at: directory, withIntermediateDirectories: true)
 
                 // Write the data directly
                 do {

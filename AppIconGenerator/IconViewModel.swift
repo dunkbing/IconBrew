@@ -16,15 +16,23 @@ class IconViewModel: ObservableObject {
     @Published var generationComplete = false
     @Published var outputFolderURL: URL?
     @Published var showCompletionAlert = false
-    @Published var selectedOutputFolder: URL?
+
+    @AppStorage("selectedOutputFolder", store: UserDefaults(suiteName: Constants.AppGroup))
+    var selectedOutputFolder: URL?
 
     // Platform toggles
-    @Published var iOSSelected = true
-    @Published var macOSSelected = true
-    @Published var watchOSSelected = true
-    @Published var androidSelected = true
-    @Published var webSelected = true
-    @Published var unifiedAppleIconsSelected = false
+    @AppStorage("iOSSelected", store: UserDefaults(suiteName: Constants.AppGroup))
+    var iOSSelected = true
+    @AppStorage("macOSSelected", store: UserDefaults(suiteName: Constants.AppGroup))
+    var macOSSelected = true
+    @AppStorage("watchOSSelected", store: UserDefaults(suiteName: Constants.AppGroup))
+    var watchOSSelected = true
+    @AppStorage("unifiedAppleIconsSelected", store: UserDefaults(suiteName: Constants.AppGroup))
+    var unifiedAppleIconsSelected = false
+    @AppStorage("androidSelected", store: UserDefaults(suiteName: Constants.AppGroup))
+    var androidSelected = true
+    @AppStorage("webSelected", store: UserDefaults(suiteName: Constants.AppGroup))
+    var webSelected = true
 
     // Error handling
     @Published var errorMessage: String?

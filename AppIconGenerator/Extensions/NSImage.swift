@@ -10,7 +10,9 @@ import AppKit
 extension NSImage {
     var cgImage: CGImage? {
         guard let imageData = tiffRepresentation else { return nil }
-        guard let sourceData = CGImageSourceCreateWithData(imageData as CFData, nil) else { return nil }
+        guard let sourceData = CGImageSourceCreateWithData(imageData as CFData, nil) else {
+            return nil
+        }
         guard let cgImage = CGImageSourceCreateImageAtIndex(sourceData, 0, nil) else { return nil }
 
         // We need to ensure the CGImage has the exact pixel dimensions we want
@@ -26,15 +28,17 @@ extension NSImage {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
 
-        guard let context = CGContext(
-            data: nil,
-            width: width,
-            height: height,
-            bitsPerComponent: 8,
-            bytesPerRow: 0,
-            space: colorSpace,
-            bitmapInfo: bitmapInfo.rawValue
-        ) else { return nil }
+        guard
+            let context = CGContext(
+                data: nil,
+                width: width,
+                height: height,
+                bitsPerComponent: 8,
+                bytesPerRow: 0,
+                space: colorSpace,
+                bitmapInfo: bitmapInfo.rawValue
+            )
+        else { return nil }
 
         // Draw the image in the context with high quality
         context.interpolationQuality = .high
@@ -54,7 +58,9 @@ extension NSImage {
         NSGraphicsContext.current?.imageInterpolation = .high
 
         // Draw at the exact target size
-        self.draw(in: NSRect(origin: .zero, size: newSize), from: NSRect(origin: .zero, size: self.size), operation: .copy, fraction: 1.0)
+        self.draw(
+            in: NSRect(origin: .zero, size: newSize), from: NSRect(origin: .zero, size: self.size),
+            operation: .copy, fraction: 1.0)
 
         newImage.unlockFocus()
 
@@ -89,10 +95,11 @@ extension NSImage {
         NSRect(origin: .zero, size: size).fill()
 
         // Draw the original image scaled to fit
-        draw(in: NSRect(origin: .zero, size: size),
-             from: NSRect(origin: .zero, size: self.size),
-             operation: .sourceOver,
-             fraction: 1.0)
+        draw(
+            in: NSRect(origin: .zero, size: size),
+            from: NSRect(origin: .zero, size: self.size),
+            operation: .sourceOver,
+            fraction: 1.0)
 
         NSGraphicsContext.restoreGraphicsState()
 
