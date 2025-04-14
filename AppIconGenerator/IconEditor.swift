@@ -391,13 +391,7 @@ struct IconEditor: View {
 
         let rect = NSRect(origin: .zero, size: targetSize)
 
-        // Draw background if needed
-        if useCustomBackground {
-            NSColor(backgroundColor).setFill()
-            NSBezierPath(rect: rect).fill()
-        }
-
-        // Calculate padding if needed
+        // Calculate padded rect for the content
         let paddedRect: NSRect
         if paddingPercentage > 0 {
             paddedRect = NSRect(
@@ -410,22 +404,36 @@ struct IconEditor: View {
             paddedRect = rect
         }
 
-        // Draw base shape with potential clipping path
-        if iconShape != .square {
-            // Create clipping path based on shape
-            let path = NSBezierPath()
+        // Draw the background with shape
+        if useCustomBackground {
+            let backgroundPath = NSBezierPath()
 
             if iconShape == .circle {
-                // Create circular clipping path
-                path.appendOval(in: paddedRect)
+                backgroundPath.appendOval(in: paddedRect)
             } else if iconShape == .roundedSquare {
-                // Create rounded rect clipping path
-                path.appendRoundedRect(
+                backgroundPath.appendRoundedRect(
                     paddedRect, xRadius: actualCornerRadius, yRadius: actualCornerRadius)
+            } else {
+                backgroundPath.appendRect(paddedRect)
             }
 
-            path.addClip()
+            NSColor(backgroundColor).setFill()
+            backgroundPath.fill()
         }
+
+        // Create image clipping path based on shape
+        let imagePath = NSBezierPath()
+
+        if iconShape == .circle {
+            imagePath.appendOval(in: paddedRect)
+        } else if iconShape == .roundedSquare {
+            imagePath.appendRoundedRect(
+                paddedRect, xRadius: actualCornerRadius, yRadius: actualCornerRadius)
+        } else {
+            imagePath.appendRect(paddedRect)
+        }
+
+        imagePath.addClip()
 
         // Draw the image
         image.draw(
