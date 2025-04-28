@@ -13,7 +13,6 @@ struct ContentView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            // Main content
             VStack(spacing: 20) {
                 HeaderView()
 

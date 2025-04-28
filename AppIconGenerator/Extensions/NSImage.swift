@@ -15,7 +15,7 @@ extension NSImage {
         }
         guard let cgImage = CGImageSourceCreateImageAtIndex(sourceData, 0, nil) else { return nil }
 
-        // We need to ensure the CGImage has the exact pixel dimensions we want
+        // ensure the CGImage has the exact pixel dimensions we want
         let width = Int(size.width)
         let height = Int(size.height)
 
@@ -99,11 +99,11 @@ extension NSImage {
             in: NSRect(origin: .zero, size: size),
             from: NSRect(origin: .zero, size: self.size),
             operation: .sourceOver,
-            fraction: 1.0)
+            fraction: 1.0
+        )
 
         NSGraphicsContext.restoreGraphicsState()
 
-        // Create a new image with the bitmap representation
         let newImage = NSImage(size: size)
         newImage.addRepresentation(bitmap)
 

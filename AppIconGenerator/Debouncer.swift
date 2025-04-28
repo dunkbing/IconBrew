@@ -16,14 +16,11 @@ class Debouncer {
     }
 
     func debounce(action: @escaping () -> Void) {
-        // Cancel the previous work item if it hasn't executed yet
         workItem?.cancel()
 
-        // Create a new work item
         let newWorkItem = DispatchWorkItem(block: action)
         workItem = newWorkItem
 
-        // Schedule the new work item after the delay
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: newWorkItem)
     }
 

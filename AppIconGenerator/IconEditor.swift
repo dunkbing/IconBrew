@@ -144,7 +144,6 @@ struct IconEditor: View {
                             isExpanded: $isShapeExpanded,
                             content: {
                                 VStack(alignment: .leading, spacing: 12) {
-                                    // Icon shape picker
                                     Text("Icon Shape")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
@@ -168,15 +167,13 @@ struct IconEditor: View {
                                         )
                                     }
 
-                                    // Padding control
                                     DebouncedSliderControl(
                                         value: $paddingPercentage,
-                                        range: 0...25,  // Up to 25% of smaller dimension
+                                        range: 0...25,
                                         label: "Padding (%)",
                                         onValueChanged: applyChanges
                                     )
 
-                                    // Border controls
                                     Toggle("Add Border", isOn: $addBorder)
                                         .onChange(of: addBorder) { _ in
                                             applyChanges()
@@ -198,7 +195,6 @@ struct IconEditor: View {
                                         )
                                     }
 
-                                    // Background controls
                                     Toggle("Custom Background", isOn: $useCustomBackground)
                                         .onChange(of: useCustomBackground) { _ in
                                             applyChanges()
@@ -284,7 +280,6 @@ struct IconEditor: View {
         let ciImage = CIImage(cgImage: cgImage)
         var currentCIImage = ciImage
 
-        // Brightness
         if brightness != 0 {
             let brightnessFilter = CIFilter(name: "CIColorControls")
             brightnessFilter?.setValue(currentCIImage, forKey: kCIInputImageKey)
@@ -294,7 +289,6 @@ struct IconEditor: View {
             }
         }
 
-        // Contrast
         if contrast != 0 {
             let contrastFilter = CIFilter(name: "CIColorControls")
             contrastFilter?.setValue(currentCIImage, forKey: kCIInputImageKey)
@@ -304,7 +298,6 @@ struct IconEditor: View {
             }
         }
 
-        // Saturation
         if saturation != 0 {
             let saturationFilter = CIFilter(name: "CIColorControls")
             saturationFilter?.setValue(currentCIImage, forKey: kCIInputImageKey)
@@ -314,7 +307,6 @@ struct IconEditor: View {
             }
         }
 
-        // Hue adjustment
         if hue != 0 {
             let hueFilter = CIFilter(name: "CIHueAdjust")
             hueFilter?.setValue(currentCIImage, forKey: kCIInputImageKey)

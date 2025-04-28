@@ -13,13 +13,8 @@ struct DebouncedSliderControl: View {
     var label: String
     var onValueChanged: () -> Void
 
-    // Keeps track of whether the slider is currently being dragged
     @State private var isDragging = false
-
-    // Local value that updates immediately for UI responsiveness
     @State private var localValue: Double
-
-    // Debouncer for handling delayed updates
     private let debouncer = Debouncer(delay: 0.3)  // 300ms delay
 
     init(
@@ -52,14 +47,10 @@ struct DebouncedSliderControl: View {
                         isDragging = editing
 
                         if !editing {
-                            // When the user stops dragging, update the binding
-                            // and trigger the callback
                             value = localValue
                             onValueChanged()
                         } else {
-                            // While dragging, setup the debounced update
                             debouncer.debounce {
-                                // This will run after the debounce period
                                 value = localValue
                                 onValueChanged()
                             }
@@ -80,7 +71,6 @@ struct DebouncedSliderControl: View {
             }
         }
         .onChange(of: value) { newValue in
-            // Keep local value in sync with external changes
             if !isDragging {
                 localValue = newValue
             }

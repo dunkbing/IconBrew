@@ -40,7 +40,6 @@ class IconViewModel: ObservableObject {
 
     @Published var showSidebar = true
 
-    // Separate property for tracking edited image
     @Published var editedImage: NSImage?
 
     func updateEditedImage(_ image: NSImage?) {
@@ -114,7 +113,6 @@ class IconViewModel: ObservableObject {
     }
 
     func generateIcons() {
-        // Use editedImage if available, otherwise use sourceImage
         guard let finalImage = editedImage ?? sourceImage else { return }
 
         if !iOSSelected && !macOSSelected && !watchOSSelected && !androidSelected && !webSelected {
@@ -124,7 +122,6 @@ class IconViewModel: ObservableObject {
         }
 
         if selectedOutputFolder == nil {
-            // If no output folder is selected, show folder picker
             let panel = NSOpenPanel()
             panel.allowsMultipleSelection = false
             panel.canChooseDirectories = true

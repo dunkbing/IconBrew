@@ -8,12 +8,6 @@
 import AppKit
 
 class IconGenerator {
-    private func adjustSizeForRetina(size: Int) -> Int {
-        // Explicitly halve the requested size to counteract Retina scaling
-        // This ensures a file named "icon_16x16.png" will actually be 16x16 pixels
-        return size / 2
-    }
-
     func generateMacOSIcons(from sourceImage: NSImage, outputFolder: URL) {
         let sizes = [
             ("icon_16x16", 16),
