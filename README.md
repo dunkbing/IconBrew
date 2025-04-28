@@ -6,13 +6,9 @@
 
 A simple macOS application that generates app icons for multiple platforms with just a few clicks.
 
-## Features
+## Download
 
-- **Easy to use**: Drag & drop or click to select source images
-- **Cross-platform support**: Generate icons for iOS, macOS, watchOS, Android, and Web
-- **Bulk generation**: Create all required sizes simultaneously
-- **Apple platform optimized**: Option to generate unified Contents.json for Apple platforms
-- **Modern UI**: Clean, intuitive SwiftUI interface
+[⬇️ Download from appstore](https://apps.apple.com/us/app/iconbrew/id6744603902)
 
 ## Requirements
 
